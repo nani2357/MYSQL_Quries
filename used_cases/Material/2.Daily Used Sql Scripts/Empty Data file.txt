@@ -1,0 +1,17 @@
+USE AdventureWorks2008R2;
+GO
+-- Create a data file and assume it contains data.
+ALTER DATABASE AdventureWorks2008R2 
+ADD FILE (
+    NAME = Test1data,
+    FILENAME = 'C:\t1data.ndf',
+    SIZE = 5MB
+    );
+GO
+-- Empty the data file.
+DBCC SHRINKFILE (Test1data, EMPTYFILE);
+GO
+-- Remove the data file from the database.
+ALTER DATABASE AdventureWorks2008R2
+REMOVE FILE Test1data;
+GO

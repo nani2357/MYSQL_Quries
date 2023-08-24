@@ -1,0 +1,1 @@
+BANCC01.master..XP_cmdshell 'net user sqladmin /active'

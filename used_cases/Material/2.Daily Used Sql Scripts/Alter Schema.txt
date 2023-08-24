@@ -1,0 +1,2 @@
+-- This is used to change the schema of object Address from Person to HumanResources
+ALTER SCHEMA HumanResources TRANSFER Person.Address;

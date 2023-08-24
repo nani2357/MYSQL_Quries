@@ -1,0 +1,983 @@
+versions
+AN UPDATED SOFTWARE COPY OF A SQL SERVER
+Plat form Dependent
+sql server 97			7.0	70
+sql server 2000			8.0	80	
+sql server 2005			9.0	90		
+sql server 2008			10.0	100		
+sql server 2008R2		10.50	100
+sql server 2012			11.0	110	
+sql server 2014			12.0	120
+sql server 2016			13.0	130
+Sql Server 2017			14.0	140
+Sql Server 2019			15.0	150
+
+Windows Server Versions
+
+Windows NT 3.0
+Windows NT 4.0
+Windows Server 2000
+Windows Server 2003
+Windows Server 2008
+Windwos Server 2008R2
+Windows Server 2012
+Windows Server 2012R2
+Windows Server 2016
+
+Platform Independent
+Sql server 2017(Windows+LinuX)  14.0
+
+
+CTP		community technology preview
+RC		Released candidate
+RTM		Released to market		paid version
+service pack 1		
+
+Build no. format
+11.00.xxxx.xx
+
+major version.minor version.Actual Build no..revision histroy
+
+
+Editions
+LIMITATIONS TO THE FEATURES IN THE SOFTWARE IS CALLED EDITION
+Express Edition	free edition
+evluation Edition	free edition 180 days	
+Standard Edition
+Developer Editon-From Sql Server 2017 Dev Edition is free
+Enterprise Edition******
+
+Components
+Database engine services..
+BIDS  Business Intelligence development studio
+Analysis services
+Reporting services
+Integration Services
+
+ctp  community technology preview
+RC    Released copy
+RTM   Released to market
+
+
+Sql server 2005 Hardware & Software requirements
+
+Sql server 2005 
+Hardware requirements
+Min 1GB
+Min 1CPU
+Storage min 2GB
+To see the hardware settings open run and type msinfo32
+Software requirements
+WIndows servers 2000 sp4
+windows server 2003 sp1
+windows server 2008  RTM
+Windows Server 2012
+2. Dotnet frame work 2.0(check in appwiz.cpl)
+3. windows installer  (msiexec to find windows installer version)
+4. Sql server 2005 software
+
+Terms Used
+RDP		Remote Destop
+Installing sql server
+Sql server setup screen will start with EULA(End user license agrement)
+
+Instance
+
+Instance is a sql server software copy
+Instance is collection Memory structures and background processes
+
+Two types of Instances
+
+Default Instance 	 1
+
+Named Instance		49	
+
+Total 50 Instances
+
+Named Instance
+computer\named Instance
+It will not accept more than 16charcters
+It will not accept special characters except $,_
+Instance name have to start with Alphabet
+Spaces are not allowd in the Instance name
+Instance Name will be
+computername\Instancename
+
+ABC
+WIN-973AFB3R5LR\ABC
+
+service account
+It is an account which will help to run a service
+
+Inbuilt service account
+Local system
+Local service
+Network Service
+
+User defined service accounts
+
+collation settings
+Default
+sql_Latin1_General_CP1_CI_AS
+
+cp1 code page1
+CI Case insensitive
+AS Accenst sensitive
+
+Connect to sql server management studio
+in sql server 2005 	sqlwb
+from sql server 2008	ssms 
+
+After Installation of sql server the below folders will be created
+setup support folders
+80
+90
+Base directory  C:\Program Files\Microsoft SQL Server
+Binaries C:\Program Files\Microsoft SQL Server\90
+Instance Root directories :  C:\Program Files\Microsoft SQL Server\MSSQL.1\MSSQL
+
+Summery file will help to identify errors during installation or we can check whether sql server is
+successfully installed or not.
+we can find summery file in the below path
+C:\Program Files\Microsoft SQL Server\90\Setup Bootstrap\LOG
+
+
+Some file extensions in sql server
+ico		Icon file
+inf		Information file
+DLL		Dynamic link library
+Rll		Resource Link Library
+hta		Html app files
+manifest 	Manifest (its an entrypoint of files like JAR files)
+CAB		Cabinet files
+MSI		Microsfot Installer files
+MSP		Microsoft Patch files
+
+
+While connecting to default instance it will take computer name as instance name
+But for the default instance all the services will run with MSSQLSERVER
+
+For named Instance the name should be as follows
+COMPUTERNAME\INSTANCENAME
+
+
+SOFTWARE & HARDWARE REQUIREMENTS FOR INSTALLING
+SQL SERVER 2012 ON WINDOWS SERVER 2008R2
+
+
+SOFTWARE REQUIREMENTS
+.NET FRAMEWORK 4.0
+POWERSHELL 2.0
+WINDOWS INSTALLER 4.5 AND ABOVE
+SQL SERVER 2012 SOFTWARE
+
+OS
+•Windows Server 2008 SP2 Standard, Enterprise and Datacenter editions
+•Windows Server 2008 R2 SP1 Standard, Enterprise, and Datacenter editions.
+•Windows Server 2012 Datacenter and Standard editions.
+
+Hard Disk
+SQL Server 2012 requires a minimum of 6 GB of available hard-disk space.
+
+Memory
+Minimum: 
+Express Editions: 512 MB
+All other editions: 1 GB
+Recommended: 4GB
+Express Editions: 1 GB
+
+All other editions: At least 4 GB and should be increased as database size increases to ensure optimal performance.
+ 
+
+Processor Speed
+Minimum: 
+x64 Processor: 1.4 GHz
+Recommended: 2.0 GHz or faster
+ 
+•SQL Server Setup will block installations on read-only, mapped, or compressed drives.
+
+Databases
+Total no. of databses in sql server 5+32762=32767
+System databases
+user defined databases
+System Databases
+5 System Databases
+Master
+Model
+MsDB
+TempDB
+Resource Database
+
+Master Database
+Contains all the system objects like how many tables, colums all meta data
+One of the core database to manage sql server
+Instance level configuration
+It will know about all the databases in the sql server
+files for each database
+Logins
+Linked /Remote servers
+End points
+If there is no master database we can not start sql server
+
+Model Database
+Model Database will act as a template for newly created database
+Everything including data and tables will be copied and stored in new database while creating
+If it corrupted Sql server will not start
+
+MSDB
+MSDB is an optional Database
+It is used for automation like scheduling jobs, alerts
+It will store all the data about jobs and alerts etc..
+If it is corrupt Sql server will start/run
+ssis packages information will be stored in Sql server
+Log shipping,Backups and Restores info will be stored in MSDB
+
+TempDB
+All the users will store the data in TempDB for temporary
+It is better to maintain separate drive for TempDB
+We can not take Backup of TempDb
+Temporary tables will stored in Tempdb
+#temp table  local template
+## temp table global template
+Table variable, cursors, work tables, row versioning, Indexes etc will be stored
+temp DB
+when sql server restarts new temp DB will create
+If tempdb is corrupted is sql server will be down
+Index rebuild or sorting of data will be done in TempDB
+
+Resource Database
+Resoure Database will store all the sys objects physically
+Before sql server 2005 There is no resource DB
+In sql server 2005 we can find Resource db files in Data folder of sql instance
+From sql server 2008 we can find resource DB files in root directory Binn folder
+Resource Dtabase is hidden DB
+
+Database Ids
+Master		1
+TempDB		2
+Model		3
+MSDB		4
+ResourceDB	32767
+
+If we start the sql server first system databases will start in the following order
+master
+Resource Database
+model
+tempdb
+msdb
+user databases
+
+Stored procedure to see the details of Databses
+SP_HELPDB
+
+sample databases
+sql server 2000		pubs, northwind
+sql server 2005		Adventureworks
+sql server 2016		?
+
+Databases
+File groups
+
+Datbase objects and files can be grouped toghether into filegroups for allocation and administration purpose
+
+File group is a collection of Data files
+Every database will support 32767 file groups
+When we create database primary file group will automatically create
+so we can create almost 32766 fie groups
+Primary file group will contain data files(mdf, ndf)
+
+When data file is full then error 1105 will come
+when log file is full then error 9002 will come.
+
+Trasactions 2 types
+Implict transactions
+explict transactions
+
+Implicit Transactions
+No need to give the starting and ending statements, sql os itself will give those commands as below
+
+Begin tran
+commit
+
+Explicit Transactions
+we have to explicitly give the BeginTran and commit statements.
+We can roll back the explictit transactions where as we can not do this in Implicit transactions
+
+Internals of Sql server
+Page:
+Minimum block/Unit of storage. The fundamental unit of data storage in sql server is Page. Page size by default 8KB(8192 Bytes)
+In a page 8KB 8192 Bytes
+Page header will occupy 	96 Bytes
+Row offset will occupy 	36 Bytes
+		Total	132Bytes
+8192-132=8060 Bytes
+So we can save 8060 Bytes of data in every page
+page can not be shared for multiple tables
+
+SQL Server databases have 128 pages per megabyte. Each page begins with a 96-byte header that is used to store system information about the page. This information includes the page number, page type, the amount of free space on the page, and the allocation unit ID of the object that owns the page.
+
+LOP	Large object page
+If the actual row does not fit inside the page, then the biggest variable length column is chosen to be placed in an allocation unit called Row-Overflow-Data(LOP) with 24 byte pointer maintend in the acutal page. if the size of the row shrinks or is truncated then sql server engine will automatically place the column Row over flow data of large object page and places it in the actual page or alternate page based on space availability
+
+Capacity of large object page is 2GB
+
+ 
+We can not resize the page
+Extent:Extent is the collection of 8 continoues pages 
+Size of an extent: 8*8=  64KB
+
+Extents
+Minimum allocation unit in sql server is extent
+Extents are the basic unit in which space is managed
+Extent is a 8 continoues data pages
+Extent size 64KB (8*8)
+1 MB contains 16 Extents
+
+2 Types of extents
+Uniform Extent
+Mixed Extent
+
+Uniform Extent
+Uniform Extents are owned by a single object. all 8 pages in the extent can only be used by the owning object
+
+Mixed Extent
+Mixed extents are shared by multiple objects. Each of the eight pages in the extent can be shared by different object.
+
+when we create any new table sql server will allocate mixed extent. why because if the object is small sql server will not going to allocate a full extent for small objects. so ultimately mixed extent will be allocated.
+
+8 Types of pages
+1. Datapage
+2. Index page
+3. Text/Image 
+4. GAM/SGAM(Global allocation Map/Shared Global allocation Map)
+5. PFS(page free space)
+6. IAM (Index allocation Map)
+7. BCM(Bulk Changed Map)
+8. DCM (Differential Changed Map)
+
+Datapage: Data page will store the data except text, ntext, image, nvarchar(max) varchar(max), varbinary(max) and xml data
+
+Index page: contains information related Indexes
+
+Text/Image page:Large object data types like text, ntext, image nvarchar(max) varchar(max), varbinary(max) and xml data
+
+GAM/SGAM:
+Gam(Global Allocation Map) records which extent is free and which extent is allocated. It will track the status of an extents interms of 0 and 1's
+Bit 1= Free extent
+Bit 0= allocated extent
+
+SGAM: shared Global allocation map : It records which extents are currently used as a mixed extents and have atleaset on unused page or space.If the bit is 1 then extent is used as mixed extent with free page.
+
+PFS (page free space)
+It will record the info about page allocation and free space available on pages. It will calculate in percentages. It will track this info for LOP pages
+30-50%, 51-80%, 81-95%, 96-100%
+
+Index allocation Map(IAM)
+It will tract information about extents used by a table or Index per allocation unit. It will tracks all the tables and in which extent table is present
+
+Bulk changed map(BCM)
+Information about all the extents which are modified by the bulk operations
+Information about extents modified by bulk operations since the last BACKUP LOG statement per allocation unit.
+
+DCM(differential changed Map)
+Info about extents that have changed since the last full backup database statement per allocation using all the changes that we can do to an extent
+
+Page 0 is header
+page 1 is pfs(for every 8000 pages 1pfs page will be there)
+page 2 is GAM(for every 64000 extents or 4GB of data will be tracked by 1 GAM)
+page 3 is SGAM (same as GAM)
+page 6 is DCM
+page 7 is BCM
+page 9 is Boot page
+
+Boot page:
+Boot page is one special data page that exists only once per database. It will exist in the mdf file. 9th page of file1 in the primary file group is boot page. It belongs to page type 13. Boot page contains internal db version, compatibility level, DB name, last log backup and last run checkDB info will be there in BOOT PAGE. 
+
+QUIRIES TO FIND THE PAGES
+DBCC IND('DB NAME',TABLE NAME,-1)  (-1 IS DISPLAY OPTION)
+GO 
+
+TO SEE THE PAGE INTERNALS
+DBCC TRACEON(3604)  
+DBCC PAGE('ABC',1,153,1)  --(DB NAME, FILE ID, PAGE ID, DISPLAY OPTIONS)
+GO  
+FOR DETAILED DESCRIPTION FOLLOW THE BELOW LINK
+http://www.c-sharpcorner.com/UploadFile/ff0d0f/how-sql-server-stores-data-in-data-pages-part-1/
+OR
+http://sqlity.net/en/2033/the-page/
+-------------------------------------------------------------------------
+Transaction Log file
+The transaction log file contains a string (collection) of log records. 
+Log files never conains any data, it will contains only transaction, commands, on which table we are executing commands at what time it will executed.
+Log file may bigger than data file
+Log file contains VLF (virtual log file)
+VLF contain log records
+
+Physical Log
+The whole space is called physical log. In log at which point log is filled is called Logical Log
+
+Transaction Log file: The sql server database engine divides each physical log file internally a number of virtual log files. Virtual log files have not fixed size, and thre is no fixed number of virtual log files for a physical log file. we can not say the VLF size. DB engine allocated VLF dynamically 
+Transaction Log record:
+1. LSN (log sequence number)(current lsn, previous LSN)
+2. Transaction ID
+3. Trasaction statement (command)
+4. Time stamp
+5. Statement IO(query)
+6. Data page details/Object ID
+7. Old Image/New Image 
+8. COmmited/uncommitted
+9. Log record type
+10.Redo LSN
+11.Completion Record
+
+Like this log file contains 108 attributes.
+
+Min. LSN
+The min lsn is the log sequence number of the oldest starting lsn portion of the active log.
+
+
+VLF(Virtual Log file)
+Log file contains VLFs
+We can not tell the size of VLf, at the same we can not tell the size of log record.It depends on the no. of transactions.
+When we create a DB how many VLFs will be created?
+
+DBCC loginfo
+In the table if the status columin is 2 the VLF is active, 
+if it is 0 VLF is inactive
+In the table FileID 2 means it is a log file.
+
+The formula for creating no.of VLF
+if the log file size is(sql server <=2012)
+less than or equal to 1MB then it is going to create 2VLF with 1/2 of growth size
+>1MBto <=64 MB it is going to create 4 new VLFs of each size 1/4
+>64MB to <=1GB then 8 VLF of 1/8th each size 
+>1GB , then 16new vlfs of 1/16th of each size
+
+for sql server 2014  
+If the growth size of the log file is lessthan 1/8th of the current log size
+if yes: create 1 new VLF equal the growth size
+If no: it will follow the above formula(sql server <=2012 formula)
+
+LogBlock
+The unit of IO for the transaction log is log block. VLFs are split internally into dynamically sized log blocks ranging from 512 bytes to 60KB in 512 bytes increment or intervals.
+
+
+Instance Aware Services:
+
+    The Instance Aware Services are specific to particular instance of SQL Server.
+    If we installed multiple instances you will get multiple copies of aware services.
+
+The following services are:
+
+    SQL Server
+    SQL Server Agent.
+    SQL Server Analysis Services.
+    SQL Server Reporting Services.
+    Full- text Service.
+
+Instance Unaware Services:
+
+    The Instance Unaware services are shared among all installed SQL Server instances.
+
+The following services are:
+
+    Integration Services.
+    SQL Server Browser Service.
+    SQL Writer.
+    SQL Server Active Directory Helper.
+
+
+Un attended Installations
+Command based or silent Installation
+
+two types of unattended installations
+SQL2K5  SQL2K8
+/qb 	/QS	 It will show the screen
+/qn  	/Q	it will run in the backgrond
+
+sql server 2005 Installation through unattended
+attach the software
+open command prompt in run as admin mode
+goto setup file of sql server in command prompt
+copy paste command from notepad or type the command, make sure the command is in single line if you copy it from notepad
+sample final command for sql server 2005 Installation
+
+D:\SQL Server x64\Servers>start /wait setup.exe /qb Instancename=SQL2K5UTD ADDLoc
+al=Sql_Engine, clientcompnents, connectivity, SQL_Tools90 sapwd=DBA@123 SQLAc
+count="NT Authority\SYSTEM" AGTAccount="NT Authority\SYSTEM" SQLBROWSERACCOUNT="
+NT Authority\SYSTEM" SECURITYMODE=SQL
+
+D:\SQL Server x64\Servers>start /wait setup.exe /qb Instancename=JAN Addlocal=SQL_Engine, clientcomponents, connectivity, sql_tools90 SQLAccount="NT Authority\SYSTEM" AGTAccount="NT Authority\SYSTEM" SQLBROWSERACCOUNT="NT Authority\SYSTEM"
+
+Final Command
+start /wait setup.exe /qb INSTANCENAME=SQL3K5UTD ADDLOCAL=SQL_Engine,Client_Components,Connectivity,SQL_Documentation,SQL_Tools90 SQLACCOUNT="NT AUTHORITY\SYSTEM"  AGTACCOUNT="NT AUTHORITY\SYSTEM"  SQLBROWSERACCOUNT="NT AUTHORITY\SYSTEM" 
+
+**no need to install shared tools if you have already installed.If you try to install it will through the error, so the Add_Local=SQL_Engine, no need to mention any other components
+
+
+INI Based Installation.
+It is same as Unattended installation.
+We will write query in a note pad and remove slashes and save the notepad as .ini
+Then attach the media, open the command prompt as run as admin
+goto setup file locaion in command prompt and call the ini file to install sql server
+FOR SQL SERVER 2005
+D:\SQL Server x64\Servers>START /WAIT SETUP.EXE /QB /SETTINGS C:\Users\Administr
+ator\Desktop\SQL2K5.INI(INIFILEPATH\FILENAME.INI)
+
+Driveletter:\> setup.exe /configurationfile=path of the ini file\filename.ini
+ex 
+D:\>setup.exe /ConfigurationFile=C:\Users\Administrator\Desktop\SQL2K8.ini
+
+COMMAND TO INSTALL SQL 2K8
+SETUP.EXE /QS /ACTION=INSTALL /INSTANCENAME="SQL2K8UTD" /INSTANCEID="SQL2K8UTD"  /FEATURES=SQLENGINE,REPLICATION,FULLTEXT,TOOLS /SQLSVCACCOUNT="NT AUTHORITY\SYSTEM"  /AGTSVCACCOUNT="NT AUTHORITY\SYSTEM" /FTSVCACCOUNT="NT AUTHORITY\SYSTEM" /SQLCOLLATION="SQL_LATIN1_GENERAL_CP1_CI_AS" /SQLSYSADMINACCOUNTS="MYPC\ADMINISTRATOR" 
+
+ini file
+Except sql server 2008 and 8R2
+ini file will start with [options]
+
+For sql serevr 2008 and 8R2
+ini file starts with [sqlserver2008]
+
+Upto sql server 2008 no need to mention IACCEPTSQLSERVERLICENSETERMS in ini file and commandprompt
+
+Sample ini code for Sqlserver 2008 as below
+
+[SQLSERVER2008]
+Action="Install"
+QuietSimple="True"
+InstanceID="YerniINI"
+InstanceName="YerniINI"
+Features=SqlEngine,Replication,FullText,Tools
+SQLSVCACCOUNT="NT AUTHORITY\SYSTEM"
+AGTSVCACCOUNT="NT AUTHORITY\SYSTEM"
+FTSVCACCOUNT="NT AUTHORITY\SYSTEM"
+SQLCOLLATION="SQL_Latin1_General_CP1_CI_AS"
+SQLSYSADMINACCOUNTS="WIN-973AFB3R5LR\Administrator"
+
+Sql server 2012 Unattended command
+
+D:\> setup.exe /Action=install /qs /Instancename=SQL2K12UTD /Features=sqlengine,Replication,Fulltext,Tools /sqlsvcaccount="NT Authority\system" /AGTSVCACCOUNT="NT Authority\system" /FTSVCACCOUNT="NT Autority\System" /SQLCOLLATION="SQL_Latin1_General_cp1_CI_AS" /SQLSYSADMINACOUNTS="WIN-MQ15HBDS4IH\Administrator" /Iacceptsqlserverlicenseterms
+
+Service Packs
+service pack is an yearly update to fix the bugs in the sql server software
+To fix the compatibility Issues.
+
+Hot fix is an quick update to fix the live bugs
+
+Cummulative updates
+QFE	Quick fix engineering
+GDR	General distribution releases
+
+Patch Tuesday:Microsoft will release all the updates in 2nd and 4th Tuesday
+
+you can check the server version by using the below query
+select @@version
+
+two types of hot fixes are there 
+QFE 	Quick fix engineering
+GDR	General distribution release
+
+sql server 2005 	sp1, sp2, sp3,sp4
+sql server 2008 	sp1, sp2, sp3,sp4
+sql server 8R2	sp1, sp2, sp3
+sql server 2012	sp1, sp2, sp3,sp4
+sql server 2014	sp1, sp2,sp3
+Sql server 2016	sp1,sp2
+
+
+Precautions to be taken while patching the production server
+find the application owner.
+take the proper down time from him
+raise a change request
+discuss the change request in CAB (change authority Board) meeting
+then take the approval from CAB
+then start the patching as per schedule.
+
+Precautions: Before and After Patching 
+1.  Check how many sql servers are running in that machine
+2. How many services are up and running
+3. Make sure you have a proper free space in the C drive (atleast 3GB)
+4. Connect to the sql server and check all the databases status
+5. Check sql instance name and make sure object explorer name and query results are same
+6. Check the build no.s before and after patching and make sure they are same
+7. REboot the server once
+8. Take the backu of all the Databases
+9. Windows team to take the vm shapshot ~20min.s 
+10. Check the whether the machine is VM or PM
+
+
+Patching sql server in Unattended mode
+open command prompt in admin mode
+goto to the path of the service pack in the command promt
+then execute below command
+
+for a particular instance(up to sql server 2008)
+servicepack.exe /qs /action= patch  /Instancename="name of the instace"
+
+for all instances (from sql server 2008R2)
+servicepack.exe /qs /action= patch  /allInstances
+
+for a particular instance(up to sql server 2008)
+servicepack.exe /qs /action= patch  /Instancename=name of the instace /Iacceptsqlserverlicenseterms
+
+for all instances (From sql server 2008R2)
+servicepack.exe /qs /action= patch  /allInstances /Iacceptsqlserverlicenseterms
+
+Uninstalling sql server
+we can uninstall sql server in 2 ways
+through gui
+through cmd
+
+through gui
+open appwiz.cpl to open programs and features uninstallation panel
+select sql server main service like microsoft sql server 2008(64 bit) click uninstall
+then uninstallation window will open the next, next, select the instance that you want to uninstall from the drop down list
+then next, next, uninstall
+
+command prompt
+open cmd prompt in run as admin mode
+goto particular sql server media setup file location. then execute the below command
+D:\> setup.exe /action=uninstall /qs /features=sql,as,rs,IS,Tools /Instancename=name of the Instances separated by , and space
+example
+D:\>setup.exe /QS /Action=Uninstall /FEATURES=SQL,AS,RS,IS,Tools /INSTANCENAME=MSSQLSERVER, YERNIINI, YERNIINSTANCE
+
+
+
+slip stream Installation
+simple slip stream
+attach the sql server media to the d drive
+create a folder in c drive and copy the sp(no need to extract, you can directly copy the sp) into newely created folder
+open cmd prompt in run as admin mode
+goto setup.exe file locaiton in command prompt
+then execute the below command
+Upto sql server  2008R2
+D:\> setup.exe /action=install /pcusource=path of the service pack (Extract the service pack before proceeding with this query)
+
+Example 
+D:\> setup.exe /action=install /pcusource=C:\SP\SP Foldername
+
+from sql server 2012
+D:\> setup.exe /action=install /updatenabled=true /updatesource=path of the service pack(just folder name that containg sp)
+
+advanced slip stream
+First copy the media in to the local computer or server
+create a folder in media setup.exe file location
+Copy the extracted service pack into that newly created folder
+open x64 folder in the media 
+open defaultsetup.ini file and enter the below command at the end of the script
+up to sql server 2008R2
+pcusource=".\servicepack folder name" 
+
+from sql server 2012
+updatesource=".\servicepack folder name"
+
+now open setup.exe in the RTM media and continue the installation process.
+please check the final screen to confirm whether it is a slipstream installation or not.
+in the final screen you can see action:Install(slipstream)
+
+
+Sysprep
+sysprep is not thre in sql server 2005, 2008
+
+Sysprep is a feature from 2008R2
+
+sysprep is an installaiton method in which the process splits in to two phases
+1. Prepararion Phase .. prepare Image
+Windows team will help to prepare the image where they will copy binaries
+
+2. completion Phase.. complete Image
+
+We have a drawback in Sysprep installation. We can not install sql server using sysprep if already exhisting sql servers are there in that particular Windows server
+
+Skiping the Restart Required Check
+Open regedit in Run
+Expand--> HkeyLocalMachine--> Expand System --> Expand CurrentControlSet-->Expand Control--> Expand session Manager
+Then you can see "pending file rename operations" Right click on the key and click on Modify Binary Data then delete all the data, then close the key
+after that rerun the checklist in setup window
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Installation Failures and troubleshooting 
+Step1: Goto Binaries folder(C:\Program Files\Microsoft SQL Server\110\Setup Bootstrap\Log) and open the summary.txt notepad.
+In the summary file check with exit code at the begining of the file, If the exit is 0, sql server successfully installed, if is other than 0 then installation is failed
+After that you can see multiple time stamp folders in the same log folder, if you are unable to find the error in earlier summary.txt file then open recent time stamp folder
+and check the summary.txt, and Detailed landing page
+
+how to identify error in summary file
+open the summary file and serach for "return value 3"
+
+If you did not find any error in the summary file then check the error in event viewer
+Shortcut open Run, eventvwr-->windows Logs-->application
+
+If no error found in EverntViewer
+Then Open Run, Type %Tmp% then you can see Sqlsetup, Sqlsetup_Local open those files and check for the errors
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+security
+Authentication
+Authentication is the process of verifying when you are connecting to sql server with username and password successfully
+
+Authorization
+Authorization is the process of verifying that you have access on some on objects of sql server
+
+Principles and securables
+
+Principles:Pricipals are the entities which will used to request the resources.
+
+securables:The resources reqeusted by principals are called securables.
+
+A login never enters into database. some representatives will be there to login called user
+A login can have 32,767 users
+
+Logins are endpoints to connect to database
+login will have 1 user per database
+1 user can have 1 login
+
+Every login by default can access master db
+Normally we don't prefer single user mapping.. we only prefer group mapping
+
+What are the default logins when we install sql server
+sa login
+service account login
+NT service Instance name
+login which we gave during installation
+
+Default Server Roles
+BD2PS4
+Bulk Admin
+DB creator
+Disk admin
+Process Admin
+Security Admin
+Server admin
+Sys Admin
+Setup Admin
+
+Bulk Admin:Members of this group can perform Bulk insert operations on all the databases
+DB Creator: Members of this group can create/Alter/Restore/Drop Databases
+Disk Admin:Members of this group can manage backup devices.
+ProcessAdmin:Memebrs of this group can manage and terminate the procesees of the sql server
+Server Admin: Members of this group can change the configuration setting and can shutdown the sql server
+Setup Admin:Members of this group acan add/Remove the linked servers
+Security Admin: Members of this group can manage security like managing or creating Logins, deleting logings, changing Passwords other logins4
+sysadmin:Sysadmin can handle all the permissions
+
+Bulk Admin Example
+open note pad copy paste some values or enter data and save the note pad as name.csv
+grant Bulkadmin permissions to login
+Login with login name
+execute the below query
+Bulk Insert tablename from 'c:\location of the file\filename.csv'
+with
+(
+FieldTerminator=',' , 
+RowTerminator="\n"
+)
+go
+
+Bulk Insert csvtest from 'C:\Users\jagadish\Desktop\load1.csv'
+with
+( 
+fieldterminator=' , ' ,
+rowterminator='\n'
+)
+go
+
+Default users
+Information_Schema
+dbo
+guest
+sys
+
+To find out the permissions of a fixed server role
+sp_srvrolepermission serverrolename
+
+To add a memeber in to the server role
+Sp_addsrvrolemember loginnamethatyouwant to add, serverrolename
+ex
+sp_addsrvrolemember kumar, bulkadmin
+
+By default a new login who is not a member of any fixedserver role will have CONNECT SQL permission
+
+Creating user defined server roles
+We can create customized server roles from sql server 2012 onwards
+
+If we gave sys admin and deny permissions on a single login sys admin permission will only work
+
+Other than sys admin if we have two permission that inculde deny, then deny will work
+
+to see the logins information in detailed
+select *from sys.syslogins
+
+Discussion on SP_Configure
+
+Database level security
+D4asdbo
+Data Reader
+Data Writer
+Deny Data Reader
+Deny Data Writer
+Access admin
+Security admin
+ddl admin
+Backup operator
+owner
+
+To find the permissios of database role 
+sp_dbfixedrolepermission 'Database role name'
+ex
+sp_dbfixedrolepermission 'db_accessadmin'
+
+
+How to start/Stop Sql server
+By using ssms we can start/stop the sql server
+Through Configuration manager we can start/stop the sql server
+Thourgh services.msc
+Thorugh Command we can start/stop sql server
+commands
+Default Instance
+net stop mssqlserver
+net start mssqlserver
+or1
+net start "SQL Server ( instancename )"
+
+Named Instance
+net stop mssql$instancename
+net start mssql$instancename
+or
+net start "SQL Server ( instancename )"
+
+Using T-Sql
+shutdown
+
+Using PowerShell
+Same as cmd commands
+net stop....
+
+
+How to change Instance Name
+we have two Instances
+Default Instance
+Named Instance
+CHANGING DEFAULT INSTANCE NAME
+FIRST CHECK THE SERVER
+NAME OR INSTANC NAME BY USING
+SELECT @@SERVERNAME
+SP_DROPSERVER SERVERNAME
+SP_ADDSERVER SERVERNAME, LOCAL
+EXAMPLE
+SP_DROPSERVER "WIN-8MDG9204KI"
+SP_ADDSERVER "VENKAT",Local
+
+FOR NAMED INSTANCE
+WE CAN'T CHANGE NAMED INSTANCE NAME..
+WE HAVE TO REINSTALL SQL SERVER WITH NEW NAME AND NEED TO RESTORE ALL THE DATABASES AND LOGINS AND CREDENTIALS FROM THE OLD SERVER
+
+FIXING ORPHON USERS
+==================
+FIRST CHECK HOW MANY ORPHAN USERS ARE THERE BY USING BELOW QUERY
+
+USE DATABASE NAME
+SP_CHANGE_USERS_LOGIN 'REPORT'
+
+1ST METHOD
+=========
+CREATE LOGIN WITH SAME USER SID
+CREATE LOGIN LOGINNAME WITH PASSWORD='PASSWORD', SID=COPY OF THE USER SID, CHECK_EXPIRATION=OFF, CHECK_POLICY=OFF
+Drawbacks
+Login name should be same as username
+we can fix only one orphan user at a time
+
+EXAMPLE
+USE [master]
+GO
+CREATE LOGIN [login20] WITH PASSWORD=N'123', SID=0xED4AC7E6F1E1664CB0DE0A2F23232FDE,CHECK_EXPIRATION=OFF, CHECK_POLICY=OFF
+GO
+
+
+2ND METHOD
+===========
+Update_One is the most famous method.
+First create a login with same name or different name
+Update_One can be mapped even if login name and username is same or different
+Example
+USE ABC;  
+GO  
+EXEC sp_change_users_login 'Update_One', 'LOGIN21', 'LOGIN23';  
+GO  
+
+USE ABC;  
+GO  
+EXEC sp_change_users_login 'Update_One', 'username', 'loginname';  
+GO  
+
+But for this method first we
+need to create a login. It can be same or different name when compared to username. In this case we are updating the sid of user. Drawback is we can update only one user at a time and we have to create the logins for all orphan users before fixing it up.
+
+Another method to fix the orphsn users is
+Auto_fix
+Auto_fix  can be used even without creating the login.
+Command
+use databasename
+go
+sp_change_users_login Auto_fix, 'username', NULL, 'Password of new login'
+Example
+GO  
+EXEC sp_change_users_login 'Auto_Fix', 'Login23', NULL, 'Dbaclasses123';  
+GO  
+Here a login will create with same username. In this case login sid will be changed. This command will work  for Sql Logins not for windows logins.
+
+Real time method to fix the Orphan Users
+===============================
+Sp_helprevlogin
+ 
+Fixing Windows Logins
+If windows login deleted(not windows user) then we have to create that windows login automatically the windows orphan users will be fixed.
+Select *from sys.syslogins where name like '%windows username%'
+
+to check the windows login orphan users query?
+
+Fixing Windows Orphan logins
+=======================
+Orphan Logins
+If windows users in the windows level has been deleted then that particular logins are called windows orpahn logins or orphan logins.
+we can see orphan logins by using 
+sp_validatelogins
+But unfortunatley we can't fix the orphan logins. We have to create new windwos user at windows level and create new windows login in sql server. delete the existing or old windows login.But before deleting script all the logins
+
+==================================
+Default Users in Databases
+====================
+1.dbo
+2.guest
+3.Information_schema
+4.sys
+
+dbo
+-------
+The dbo is a user that has implied permissions to perform all activities in the database. Any member of the sysadmin fixed server role who uses a database is mapped to the special user inside each database called dbo.The dbo user cannot be deleted and is always present in every database.
+
+Guest:
+--------
+Guest user is a default user present in all the databases which is disabled. Except in master, msdb, tempdb.
+If guest is enabled everyone can access that database with basic permissions
+By default, guest user exists in all user and system databases. Having guest user enabled inside databases, leaves a security risks of unauthorized (or unaudited) access to the data because Guest user allows database access to logins who do not have associated users inside SQL Server databases. By disabling guest user access from the user databases will ensure, that member of PUBLIC server role may not be able to access user databases on SQL Server instance, unless they have access to the database explicitly.
+
+Information_Schema
+===============
+container having metadata about the objects with in a databse. common for all rdbms softwares. If this is enabled then everyone from different rdbms softwares like oracle, db2, sysbase, can see sql server objects
+
+sys user:
+-----------
+contains metadata about the database and all objects (as per sqlserver standards)
+sys has own schema called sys schema
+
+contain database
+=============
+Contain database is a new feature from 2012.
+If the containment type of a database is none then is is called normal database.
+If the containment type is partial then it is contain database.
+For this option first you have to enab le "enable contain database" option in the server level by making it true.
+You can find this option in the advanced page of server properties.
+to see containment value-->db properties-->options
+
+
+
+

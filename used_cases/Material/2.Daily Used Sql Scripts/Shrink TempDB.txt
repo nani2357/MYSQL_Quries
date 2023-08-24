@@ -1,0 +1,25 @@
+use tempdb
+GO
+SELECT name, size
+FROM sys.master_files
+WHERE database_id = DB_ID(N'tempdb');
+GO
+Checkpoint
+go
+
+DBCC FREEPROCCACHE --clean cache. can cause performance issue
+
+DBCC FREESESSIONCACHE --clean session cache. run only if DBCC FREEPROCCACHE does not free up space. This can cause performance issue
+
+dbcc shrinkfile ('tempdev') -- Replace with correct file name
+dbcc shrinkfile ('temp2') -- Replace with correct file name
+dbcc shrinkfile ('temp3') -- Replace with correct file name
+dbcc shrinkfile ('temp4') -- Replace with correct file name
+dbcc shrinkfile ('temp5') -- Replace with correct file name
+dbcc shrinkfile ('temp6') -- Replace with correct file name
+dbcc shrinkfile ('temp7') -- Replace with correct file name
+dbcc shrinkfile ('temp8') -- Replace with correct file name
+--Do the same if you have more tempdb files.
+dbcc shrinkfile ('templog') -- Replace with correct file name (if need to shrink log file)
+GO
+

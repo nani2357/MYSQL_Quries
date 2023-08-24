@@ -1,0 +1,35 @@
+Script to change the MAXDOP value
+
+--Find the current MAXDOP value using below query
+select value from sys.configurations where name='max degree of parallelism'
+--Change MAXDOP value
+declare @MaxDop int,
+        @NumaNodes int,
+        @NumberOfCores int
+SELECT @NumaNodes = COUNT(DISTINCT memory_node_id) FROM sys.dm_os_memory_clerks WHERE memory_node_id!=64
+SELECT @NumberOfCores = COUNT(scheduler_id) FROM sys.dm_os_schedulers WHERE status = 'VISIBLE ONLINE'
+If (@NumaNodes = 1)
+Begin
+    If (@NumberOfCores <= 8)
+    begin
+        set @MaxDop = @NumberOfCores
+    end
+    else begin
+        set @MaxDop = 8
+    end
+End
+else Begin
+    If ((@NumberOfCores /@NumaNodes) <= 8)
+    Begin
+        set @MaxDop = @NumberOfCores / @NumaNodes
+    End
+    else Begin
+        set @MaxDop = 8
+    end
+End
+if not exists (select 1 from sys.configurations where name = 'max degree of parallelism'
+        and convert(int, isnull(value,value_in_use)) = @MaxDop)
+begin
+    exec sp_configure 'max degree of parallelism', @MaxDop
+    RECONFIGURE WITH OVERRIDE
+end

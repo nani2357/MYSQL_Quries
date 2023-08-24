@@ -1,0 +1,12 @@
+master..xp_cmdshell 'ipconfig'
+
+
+select req.session_id, req.command,
+d.name,
+percent_complete, dateadd(second,estimated_completion_time/1000, getdate()), Getdate() as now, 
+datediff(minute, start_time, getdate()) as running, estimated_completion_time/1000/60 as togo,
+start_time 
+from sys.dm_exec_requests req
+inner join sys.sysdatabases d on d.dbid = req.database_id
+where 
+req.command in ('RESTORE DATABASE', 'BACKUP DATABASE', 'RESTORE LOG', 'BACKUP LOG')

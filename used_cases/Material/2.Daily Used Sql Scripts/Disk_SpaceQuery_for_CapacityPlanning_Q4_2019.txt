@@ -1,0 +1,207 @@
+
+Declare @SQL varchar(max)  
+
+EXEC sp_configure 'allow updates', 0;
+EXEC sp_configure 'show advanced option', '1';
+RECONFIGURE WITH OVERRIDE; 
+
+Declare @EnableXpCmdShell int 
+
+if (SELECT CONVERT(INT, ISNULL(value, value_in_use)) AS config_value
+FROM  sys.configurations
+WHERE  name = 'xp_cmdshell') = 0
+begin
+	print 'enabling xp_cmdshell'
+ 	select @EnableXpCmdShell = 1
+	EXEC sp_configure 'xp_cmdshell',1;
+	RECONFIGURE
+end
+
+
+create table #output (ordinal int identity(1,1), outputline varchar(max))
+
+insert into #output 
+exec master..xp_cmdshell 'powershell "Get-WmiObject Win32_Volume | select-object systemname, blocksize, capacity, caption, label,  freespace |? {$_.blocksize -gt 0} | fl "'
+--exec master..xp_cmdshell 'powershell "Get-WmiObject Win32_Volume | select-object systemname, blocksize, capacity, caption, label,  freespace |? {$_.blocksize -gt 0} | fl "'
+
+
+/*
+systemname  : DATA5_SVR
+label       : System
+name        : C:\
+blocksize   : 512
+FreeSpace   : 24.05
+Capacity   : 136.70
+Percentfree : 17.59
+PercentUsed : 82.41
+
+SystemName : INDEXENGINE-2
+BlockSize  : 4096
+Capacity   : 299962101760
+Caption    : C:\
+Label      : System
+Name       : C:\
+FreeSpace  : 99070369792
+*/
+
+create table #drivespace (ComputerName varchar(255), DeviceID varchar(255),DeviceLabel varchar(255), BlockSize int, FreeSpace numeric(10,2), DriveSize numeric(10,2), PercentFree numeric(8,2), PercentUsed numeric(8,2))
+
+declare @ordinal int 
+declare @outputline varchar(max)
+
+select top 1 @ordinal = ordinal, @outputline = outputline from #output /*where outputline is not null */ order by ordinal 
+
+while (select count(0) from #output) > 0
+begin
+
+if @outputline is not null
+	begin
+	/* lets get our rows */
+	declare @innerloop int
+	declare @computer varchar(255), @deviceID varchar(255),@DeviceLabel varchar(255), @BlockSize int, @FreeSpace numeric(20,2), @Capacity numeric(20,2), @PercentFree numeric(8,2), @PercentUsed numeric(8,2)
+	select @innerloop = 0
+	while @innerloop < 6
+		begin
+
+--print @outputline
+
+			if @outputline like '%systemname%'  select @computer = ltrim(rtrim(substring(@outputline, charindex(':',@outputline) + 1, len(@outputline))))
+			if @outputline like '%caption%' select @deviceID = ltrim(rtrim(substring(@outputline, charindex(':',@outputline) + 1, len(@outputline))))
+			if @outputline like '%label%' select @DeviceLabel = ltrim(rtrim(substring(@outputline, charindex(':',@outputline) + 1, len(@outputline))))
+			if @outputline like '%capacity%' select @Capacity = ltrim(rtrim(substring(@outputline, charindex(':',@outputline) + 1, len(@outputline)))) 
+			if @outputline like '%blocksize%' select @BlockSize = ltrim(rtrim(substring(@outputline, charindex(':',@outputline) + 1, len(@outputline))))
+			if @outputline like '%freespace%' and len(@outputline) > 12
+			--if @outputline like '%percentused%' 
+				begin 
+					select @FreeSpace = ltrim(rtrim(substring(@outputline, charindex(':',@outputline) + 1, len(@outputline))))
+					--select @PercentUsed = ltrim(rtrim(substring(@outputline, charindex(':',@outputline) + 1, len(@outputline))))
+					select  @PercentFree =(round((@FreeSpace/1073741824),2)/(@Capacity/1073741824))*100
+					select @PercentUsed = 100-@PercentFree
+					insert into #drivespace (ComputerName, DeviceID,DeviceLabel,BlockSize, FreeSpace,DriveSize,PercentFree,PercentUsed)
+					select @computer, @deviceID, @DeviceLabel, @BlockSize, @FreeSpace/1073741824, @Capacity/1073741824, @PercentFree, @PercentUsed 
+				end
+		
+			delete from #output where ordinal = @ordinal
+			select top 1 @ordinal = ordinal, @outputline = outputline from #output /*where outputline is not null */ order by ordinal 
+
+			select @innerloop = @innerloop +1
+		end
+	end
+else
+	begin
+	
+		delete from #output where ordinal = @ordinal
+		select top 1 @ordinal = ordinal, @outputline = outputline from #output /*where outputline is not null */ order by ordinal 
+
+	end
+
+end
+
+
+drop table #output
+
+
+if (@EnableXpCmdShell) = 1
+begin
+	print 'Disabling xp_cmdshell'
+ 	EXEC sp_configure 'xp_cmdshell',0;
+	RECONFIGURE
+end
+
+EXEC sp_configure 'show advanced option', '0';
+
+declare @datadrive varchar(1000)
+
+------------------------
+select  @datadrive = 'select @@servername SQLServerName,/* SERVERPROPERTY(''ComputerNamePhysicalNetBIOS'') CurrentHostName,*/
+DeviceID, DeviceLabel,BlockSize, FreeSpace,DriveSize, PercentFree,PercentUsed    from #drivespace where DeviceID not like ''\\?\%'' order by DeviceID'
+exec (@datadrive)
+
+drop table #drivespace
+
+
+
+
+
+SELECT DISTINCT dovs.logical_volume_name AS LogicalName,
+dovs.volume_mount_point AS Drive,CONVERT(INT,dovs.total_bytes/1048576.0)/1024.0 AS TotalSpaceINGB,
+CONVERT(INT,dovs.available_bytes/1048576.0)/1024.0 AS FreeSpaceInGB, 
+cast((CONVERT(INT,dovs.available_bytes/1048576.0)/1024.0)/(CONVERT(INT,dovs.total_bytes/1048576.0)/1024.0 ) * 100 as numeric(13,2)) AS FreePercentage, 
+cast(serverproperty('productversion') as varchar(100))+' '+ cast(SERVERPROPERTY('edition') as varchar(100)) as SQLversion, serverproperty('productlevel') ServicePack
+ 
+FROM sys.master_files mf
+CROSS APPLY sys.dm_os_volume_stats(mf.database_id, mf.FILE_ID) dovs
+ORDER BY FreeSpaceInGB ASC
+GO
+
+declare @backup_type CHAR(1) = 'D' --'D' full, 'L' log
+        ;with Radhe as (
+            SELECT  @@Servername as [Server_Name],
+            B.name as Database_Name, 
+            ISNULL(STR(ABS(DATEDIFF(day, GetDate(), MAX(backup_finish_date)))), 'NEVER') as DaysSinceLastBackup,
+            ISNULL(Convert(char(11), MAX(backup_finish_date), 113)+ ' ' + CONVERT(VARCHAR(8),MAX(backup_finish_date),108), 'NEVER') as LastBackupDate
+            ,CompressedBackupSize_GB=CAST(COALESCE(MAX(A.compressed_backup_size),0)/1024.00/1024.00/1024.00 AS NUMERIC(18,2))
+            ,CompressedBackupSize_MB=CAST(COALESCE(MAX(A.compressed_backup_size),0)/1024.00/1024.00 AS NUMERIC(18,2))
+            ,media_set_id = MAX(A.media_set_id)
+            ,[AVG Backup Duration]= AVG(CAST(DATEDIFF(s, A.backup_start_date, A.backup_finish_date) AS int))
+            ,[Longest Backup Duration]= MAX(CAST(DATEDIFF(s, A.backup_start_date, A.backup_finish_date) AS int))
+            ,A.type
+            FROM sys.databases B 
+
+            LEFT OUTER JOIN msdb.dbo.backupset A 
+                         ON A.database_name = B.name 
+                        AND A.is_copy_only = 0
+                        AND (@backup_type IS NULL OR A.type = @backup_type  )
+
+            GROUP BY B.Name, A.type
+
+        )
+
+         SELECT r.[Server_Name]
+               ,r.Database_Name
+               ,[Backup Type] = r.type 
+               ,r.LastBackupDate
+			   ,F.physical_device_name
+               ,r.CompressedBackupSize_GB
+               ,r.CompressedBackupSize_MB
+               ,r.[AVG Backup Duration]
+               ,r.[Longest Backup Duration]
+			   ,r.DaysSinceLastBackup
+
+           FROM Radhe r
+
+            LEFT OUTER JOIN msdb.dbo.backupmediafamily F
+                         ON r.media_set_id = F.media_set_id
+
+						 where F.physical_device_name is not null
+            ORDER BY r.Server_Name, r.Database_Name
+            
+            
+-------------------------------------------------------------------
+/*To check the Auto growth setting
+
+select DB_NAME(mf.database_id) database_name,
+ mf.name logical_name,
+ CONVERT (DECIMAL (20,2) , (CONVERT(DECIMAL, size)/128)) [file_size_MB],
+ CASE mf.is_percent_growth
+    WHEN 1 THEN 'Yes'
+    ELSE 'No'
+  END AS [is_percent_growth],
+  CASE mf.is_percent_growth
+    WHEN 1 THEN CONVERT(VARCHAR, mf.growth) + '%'
+    WHEN 0 THEN CONVERT(VARCHAR, mf.growth/128) + ' MB'
+  END AS [growth_in_increment_of],
+  CASE mf.is_percent_growth
+    WHEN 1 THEN CONVERT(DECIMAL(20,2), (((CONVERT(DECIMAL, size)*growth)/100)*8)/1024)
+    WHEN 0 THEN CONVERT(DECIMAL(20,2), (CONVERT(DECIMAL, growth)/128))
+  END AS [next_auto_growth_size_MB],
+  CASE mf.max_size
+    WHEN 0 THEN 'No growth is allowed'
+    WHEN -1 THEN 'File will grow until the disk is full'
+    ELSE CONVERT(VARCHAR, mf.max_size)
+  END AS [max_size],
+  physical_name
+from sys.master_files mf
+where physical_name like 'E:\DATA\VOL01\%'
+            
+--change the drive letter at the end fo this script. change it to Data drive letter.*/

@@ -1,0 +1,47 @@
+– For SQL 2000 
+
+
+SELECT 'Index Name' = i.name, 'Table Name' = o.name,
+   'Statistics Date' = STATS_DATE(i.id, i.indid)
+FROM sysobjects o, sysindexes i
+where o.id = i.id
+
+
+
+-------------------
+
+– For SQL 2005/SQL 2008   
+
+
+select a.id as 'ObjectID', isnull(a.name,'Heap') as 'IndexName', b.name as 'TableName',
+stats_date (id,indid) as stats_last_updated_time
+from sys.sysindexes as a
+inner join sys.objects as b
+on a.id = b.object_id
+where b.type = 'U'
+
+--
+
+USE AdventureWorks
+GO
+SELECT name AS index_name,
+STATS_DATE(OBJECT_ID, index_id) AS StatsUpdated
+FROM sys.indexes
+WHERE OBJECT_ID = OBJECT_ID('HumanResources.Department')
+GO
+
+--
+
+
+ SELECT OBJECT_NAME(A.object_id) AS Object_Name, A.name AS index_name, STATS_DATE(A.OBJECT_ID, index_id) AS StatsUpdated ,
+
+ DATEDIFF(d,STATS_DATE(A.OBJECT_ID, index_id),getdate()) DaysOld
+
+ FROM sys.indexes A
+
+ INNER JOIN sys.tables B ON A.object_id = B.object_id
+
+ WHERE A.name IS NOT NULL
+
+ ORDER BY DATEDIFF(d,STATS_DATE(A.OBJECT_ID, index_id),getdate()) DESC
+

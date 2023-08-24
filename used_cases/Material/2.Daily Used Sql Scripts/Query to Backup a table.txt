@@ -1,0 +1,7 @@
+Query to Backup a table
+
+Select *into Tablename_new from Tablename_old
+
+Tablename_old--Refers to Source table
+
+Tablename_new-- Refers to destination table

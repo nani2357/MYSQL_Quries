@@ -1,0 +1,71 @@
+
+
+dbcc showcontig with tableresults,all_indexes
+
+
+
+---for sql 2000
+
+select
+'DBCC DBREINDEX ('+''''+user_name(u.uid)+''+'.' +o.name+ ''''+','+''''+i.name+''''+','+'0'+')'
+    from sysobjects o join sysusers u on o.uid=u.uid
+    join sysindexes i on i.id = o.id
+    where o.type = 'U'
+    and i.indid > 0
+    and i.indid < 250
+    and o.name IN
+(
+
+'TblInteraction',
+'tblInteraction_BounceBackDetails',
+'tblInteraction_EscalationDetails',
+'tblInteraction_QuickKillReOpenRemarks',
+'tblInteraction_TeamTAT',
+'tblInteraction_TotalTAT',
+'tblInteraction_Trans',
+'TblInteractionAuditTrail',
+'TblInteractionTeamTATMaster',
+'TblInteractionTotalTATMaster',
+'TblLocationMappingForFlow',
+'TblUser'
+
+)
+and i.name not like '_WA%'
+order by i.rows desc
+
+
+
+
+
+
+
+-- 
+
+
+select 
+'DBCC DBREINDEX ('+''''+user_name(u.uid)+''+'.' +o.name+ ''''+','+''''+i.name+''''+','+'0'+')',
+reserved as [reserved (KB)], used as [used (KB)]
+    from sysobjects o join sysusers u on o.uid=u.uid
+    join sysindexes i on i.id = o.id
+    where o.type = 'U'
+    and i.indid > 0
+    and i.indid < 250
+    and o.name IN
+(
+
+
+'tblSQLForView',
+'tblObjectType7_30',
+'tblCustomer_Dedupe_CDS',
+'tblQueryValue',
+'tblOrderNumericAudit',
+'tbltmpAttachment',
+'tblObjectType28_1',
+'tblUCVSMS',
+'tblObjectType3_8',
+'tblattachment'
+
+
+)
+and i.name not like '_WA%'
+order by o.name,reserved desc

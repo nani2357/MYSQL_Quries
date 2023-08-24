@@ -1,0 +1,9 @@
+use msdb
+go
+SELECT      bs.database_name,CONVERT(VARCHAR(20),bs.backup_start_date,113),CONVERT(VARCHAR(20),bs.backup_finish_date,113),bs.type,bf.physical_device_name
+FROM         backupset bs join backupmediafamily bf
+on bs.media_set_id = bf.media_set_id
+where bf.physical_device_name like '%%' and (backup_finish_date > (getdate() - 10)) and bs.database_name like '%VCDB%'
+and bs.type in ('D','I','L')
+ORDER BY backup_set_id DESC
+go 

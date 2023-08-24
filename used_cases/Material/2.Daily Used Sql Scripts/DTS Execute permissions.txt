@@ -1,0 +1,11 @@
+DTS Execute permissions:
+
+
+GRANT EXECUTE ON [dbo].[sp_get_dtsversion] TO Integra
+GO
+GRANT EXECUTE ON [dbo].[sp_add_dtspackage] TO Integra
+GO
+GRANT EXECUTE ON [dbo].[sp_get_dtspackage] TO Integra
+GO
+GRANT EXECUTE ON [dbo].[sp_enum_dtspackages] TO Integra
+GO

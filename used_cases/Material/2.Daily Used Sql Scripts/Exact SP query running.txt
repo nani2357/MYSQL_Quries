@@ -1,0 +1,10 @@
+select 
+    der.session_id,qt.text
+    , SUBSTRING(qt.text, (der.statement_start_offset/2) + 1,
+((CASE statement_end_offset 
+WHEN -1 THEN DATALENGTH(qt.text)
+ELSE der.statement_end_offset END 
+- der.statement_start_offset)/2) + 1) as statement_text
+from sys.dm_exec_requests der
+CROSS APPLY sys.dm_exec_sql_text(der.sql_handle) as qt
+WHERE der.session_id = <SPID> -- Enter SPID here

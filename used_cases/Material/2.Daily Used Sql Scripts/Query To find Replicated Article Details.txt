@@ -1,0 +1,16 @@
+--Query To find Replicated Article Details
+
+SELECT
+ pub.name AS [Publication],
+ art.name as [Article],
+ serv.name as [Subsriber],
+ sub.dest_db as [DestinationDB]
+FROM dbo.syssubscriptions sub
+INNER JOIN sys.servers serv
+ON serv.server_id = sub.srvid
+INNER JOIN dbo.sysarticles art
+ON art.artid = sub.artid
+INNER JOIN dbo.syspublications pub
+ON pub.pubid = art.pubid
+where art.name like '%CMBSIndicesData%'
+ 

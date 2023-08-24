@@ -1,0 +1,16 @@
+To get detailed information about an article in the listed publisher, run the following T-SQL
+
+DECLARE @publication AS sysname;
+SET @publication = N'PROD_HIST_Pub';
+ 
+USE MES_PROD_AP
+EXEC sp_helparticle
+  @publication = @publication;
+GO
+
+
+EX
+USE iboxxDW
+EXEC sp_helparticle
+  @publication = [Bond Data Filtered];
+GO

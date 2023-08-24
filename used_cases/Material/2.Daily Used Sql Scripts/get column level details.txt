@@ -1,0 +1,5 @@
+To get column level details, run the following T-SQL
+
+USE MES_PROD_AP
+GO
+sp_helparticlecolumns  @publication = N'PROD_HIST_Pub' ,  @article =  'tb_Branch_Plant'

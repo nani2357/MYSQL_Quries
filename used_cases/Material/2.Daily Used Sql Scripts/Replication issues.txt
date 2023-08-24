@@ -1,0 +1,39 @@
+sp_dbremovereplication
+
+while removing replcation if we are getting error like distributor database is participating in replication and can not be removed.
+in such case make the distributor database offline and drop db
+
+Error
+An error occurred while processing the log for database 'iboxxStaticData_Bloomberg'.  If possible, restore from backup. If a backup is not available, it might be necessary to rebuild the log. (Source: MSSQLServer, Error number: 9004)
+Get help: http://help/9004
+
+since it is qa server, i have restarted the log reader job and distributr job.
+
+and check for any sessions running for this db , if it occupying the log space, then kill it and shrink the log file.
+
+and for missing stored proc errors,  we need to script out those stored proc from publisher and excute it on subscriber.
+
+If you got missing stored procs error
+
+
+for missing stored proc errors,  we need to script out those stored proc from publisher and excute it on subscriber.
+
+
+
+USE my_published_db
+
+GO
+
+EXEC sp_scriptpublicationcustomprocs @publication='my_publication'
+
+
+Example
+Use IndexEngine
+Go
+EXEC sp_scriptpublicationcustomprocs @publication='INDEXENGINE'
+
+run the query on the Publisher You will get one output.. copy paste the whole output  script from
+publisher and execute it in the Subscriber under respective Database
+
+
+

@@ -1,0 +1,27 @@
+
+select 'ALTER INDEX ',+ i.name + ' ON '+user_name(u.uid)+'.'+o.name + ' REBUILD with (ONLINE=ON)' from sysobjects o join sysusers u on o.uid=u.uid JOIN SYSINDEXES i ON i.id = o.id where o.type = 'U' and i.indid > 0
+and i.name NOT LIKE '%_WA_Sys%' and o.name IN  (
+'SanctionDetails',
+
+'DisciplineMastertemp'
+
+
+) order by i.rows desc 
+
+
+2000--
+
+
+
+select 
+-- -- 'DBCC DBREINDEX ('+''''+user_name(u.uid)+''+'.' +o.name+ ''''+','+''''+i.name+''''+','+'0'+')',
+-- -- reserved as [reserved (KB)], used as [used (KB)]
+-- --     from sysobjects o join sysusers u on o.uid=u.uid
+-- --     join sysindexes i on i.id = o.id
+-- --     where o.type = 'U'
+-- --     and i.indid > 0
+-- --     and i.indid < 250
+-- --     and o.name IN
+-- -- ('tblBiztalkCustomerDTS') 
+-- -- and i.name not like '_WA%'
+-- -- order by o.name,reserved desc

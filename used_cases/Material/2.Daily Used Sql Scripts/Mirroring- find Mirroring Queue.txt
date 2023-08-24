@@ -1,0 +1,16 @@
+--Mirroring- find Mirroring Queue
+
+select d.database_id, d.name
+        , o.[cntr_value]/1024/1024 as   [LogSendQueueGB]
+        , o.[cntr_value] as   [LogSendQueueKB]
+           ,   dm.mirroring_partner_instance
+           ,   dm.mirroring_partner_name
+           ,   dm.mirroring_safety_level_desc
+           , mirroring_state_desc
+          
+    from sys.database_mirroring dm
+    inner join sys.databases d on (dm.database_id=d.database_id)
+    inner join sys.dm_os_performance_counters o on o.instance_name = d.name AND
+      [counter_name] IN ('Log Send Queue KB')
+      
+      select *from sys.database_mirroring

@@ -1,0 +1,1 @@
+"%ProgramFiles%\Microsoft SQL Server\90\Setup Bootstrap\ARPWrapper.exe /Remove"

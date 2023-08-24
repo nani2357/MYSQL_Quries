@@ -1,0 +1,141 @@
+---------compressed backup in sql 2008
+BACKUP DATABASE Capitaline TO  DISK = N'F:\BACKUP\Capitaline_Full.bak' 
+WITH NOFORMAT, NOINIT,  NAME = N'Capitaline-Full Database Backup', 
+SKIP, NOREWIND, NOUNLOAD, COMPRESSION,  STATS = 10
+GO
+---To configure ssis package
+MsDtsSrvr.ini.xml---instance name
+-------------------
+sp_changedbowner 'sa'
+-------------------------------------------
+-----TO UNLOCK THE USER:-
+
+alter login BMTS with password='@bmts321@' unlock
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+----TO FIND BLOCKING:-
+
+XP_CMDSHELL'IPCONFIG'
+SELECT * FROM SYSPROCESSES WHERE SPID>50 and blocked<> 0 and blocked <> spid  ---- IN 2000
+SELECT * FROM SYSPROCESSES WHERE SPID>50 and blocked<>0 ----IN 2005 AND 2008
+select * from sys.dm_exec_requests where session_id>50 order 
+select * from sys.dm_exec_sql_text ()
+dbcc inputbuffer(70)
+SELECT * FROM SYSPROCESSES WHERE SPID>50 and dbid=6 and status<>'sleeping';
+sp_who2
+sp_who2 active
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+----STOP/START THE SERVICES:_
+
+BACKUP DATABASE [] TO DISK = '' WITH STATS = 5, COPY_ONLY
+
+XP_CMDSHELL'IPCONFIG'
+SELECT * FROM SYSPROCESSES WHERE SPID>50 AND CMD LIKE '%BACKUP%'
+SELECT * FROM SYSPROCESSES WHERE SPID>50 AND CMD LIKE '%REST%'
+SELECT 'KILL',SPID FROM SYSPROCESSES WHERE SPID>50 AND SPID <> @@SPID
+
+dbcc inputbuffer()
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+----REINDEXING:-
+
+1) dbcc showcontig with tableresults,all_indexes
+2) sp_helpfile -- note down the path and chk whether log shipping is configured or not. chk all the things...
+3)in another query window type..
+ xp_fixeddrives
+go
+dbcc sqlperf(logspace)
+4) select
+'DBCC DBREINDEX ('+''''+user_name(u.uid)+''+'.' +o.name+ ''''+','+''''+i.name+''''+','+'0'+')'
+   from sysobjects o join sysusers u on o.uid=u.uid
+   join sysindexes i on i.id = o.id
+   where o.type = 'U'
+   and i.indid > 0
+   and i.indid < 250
+   and I.name IN
+('
+
+
+)
+and i.name not like '_WA%'
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+----UPDATE STATISTICS:-
+
+select 'UPDATE STATISTICS '+user_name(uid)+'.'+name+ ' WITH FULLSCAN' from sysobjects where type ='U'
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+----TO GET SERVICE PACK INFO :-
+
+SELECT
+SERVERPROPERTY('Edition') AS 'Edition',
+SERVERPROPERTY('ProductVersion') AS 'ProductVersion',
+SERVERPROPERTY('ProductLevel') AS 'ProductLevel',
+SERVERPROPERTY('ResourceLastUpdateDateTime') AS 'ResourceLastUpdateDateTime',
+SERVERPROPERTY('ResourceVersion') AS 'ResourceVersion'
+GO
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+----HOW TO TAKE DATABASE OFFLINE:
+
+sp_dboption 'TravelDesk','offline','true'
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+----TO SHRINK THE GROWTH:-
+
+xp_cmdshell'ipconfig'
+
+select growth,
+       name,filename,
+       size*8.0*1024/(1024*1024) as TotalMB,
+       fileproperty(name,'SpaceUsed')*8.0*1024/(1024*1024) as UsedMB,
+       size*8.0*1024/(1024*1024) -
+       fileproperty(name,'SpaceUsed')*8.0*1024/(1024*1024) as FreeMB
+from
+       sysfiles
+where
+       (status & 0x2) <> 0
+
+SELECT f.growth,f.name AS [File Name] , f.physical_name AS [Physical Name], 
+CAST((f.size/128.0) AS decimal(15,2)) AS [Total Size in MB],
+CAST(fileproperty(f.name,'SpaceUsed') /128.0 AS decimal(15,2)) as UsedMB,
+CAST(f.size/128.0 - CAST(FILEPROPERTY(f.name, 'SpaceUsed') AS int)/128.0 AS decimal(15,2)) 
+AS [Free Space In MB], [file_id], fg.name AS [Filegroup Name]
+FROM sys.database_files AS f WITH (NOLOCK) 
+LEFT OUTER JOIN sys.data_spaces AS fg WITH (NOLOCK) 
+ON f.data_space_id = fg.data_space_id OPTION (RECOMPILE);
+
+
+
+dbcc shrinkfile(filename,100)
+
+MLXRTGRETICRDBO
+MLXRTGRETICRDBO
+----------------------
+SELECT TOP 5 query_stats.query_hash AS "Query Hash",
+
+    SUM(query_stats.total_worker_time) / SUM(query_stats.execution_count) AS "Avg CPU Time",
+
+    MIN(query_stats.statement_text) AS "Statement Text"
+
+FROM
+
+    (SELECT QS.*,
+
+    SUBSTRING(ST.text, (QS.statement_start_offset/2) + 1,
+
+    ((CASE statement_end_offset
+
+        WHEN -1 THEN DATALENGTH(ST.text)
+
+        ELSE QS.statement_end_offset END
+
+            - QS.statement_start_offset)/2) + 1) AS statement_text
+
+     FROM sys.dm_exec_query_stats AS QS
+
+     CROSS APPLY sys.dm_exec_sql_text(QS.sql_handle) as ST) as query_stats
+
+GROUP BY query_stats.query_hash
+
+ORDER BY 2 DESC;
+
+
+------------install sql from commmand prompt.
+Setup.exe /q /ACTION=Install /FEATURES=SQL,Tools /INSTANCENAME=SQL2008STD /InstanceID=SQL2008STD /SQLSVCACCOUNT="MLXIPRUWEGA01\sqladmin" /SQLSVCPASSWORD="I$W1DEN1NGT$" /SQLSYSADMINACCOUNTS="MLXIPRUWEGA01\sqladmin" /AGTSVCACCOUNT="NT AUTHORITY\Network Service" /IACCEPTSQLSERVERLICENSETERMS
+
+

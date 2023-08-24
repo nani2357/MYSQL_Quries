@@ -1,0 +1,22 @@
+http://msdn.microsoft.com/en-us/library/ms143755(v=sql.105).aspx
+
+Install Backward compatibility for 2005
+Install DTS Designer
+
+Then make the following changes:
+
+To ensure that the DTS designer can be used in SQL Server Management Studio
+Copy the files, SEMSFC.DLL, SQLGUI.DLL, and SQLSVC.DLL, from the %ProgramFiles%\Microsoft SQL Server\80\Tools\Binn folder to the %ProgramFiles%\Microsoft SQL Server\100\Tools\Binn\VSShell\Common7\IDE folder.
+
+Copy the files, SEMSFC.RLL, SQLGUI.RLL, and SQLSVC.RLL, from the %ProgramFiles%\Microsoft SQL Server\80\Tools\Binn\Resources folder to the %ProgramFiles%\Microsoft SQL Server\100\Tools\Binn\VSShell\Common7\IDE\Resources\%lang_id% folder. For example, for U.S. English, the lang_id subfolder will be "1033".
+
+----- This is to provide Execution rights on DTS packages:
+
+GRANT EXECUTE ON [dbo].[sp_get_dtsversion] TO vkgadm
+GO
+GRANT EXECUTE ON [dbo].[sp_add_dtspackage] TO vkgadm
+GO
+GRANT EXECUTE ON [dbo].[sp_get_dtspackage] TO vkgadm
+GO
+GRANT EXECUTE ON [dbo].[sp_enum_dtspackages] TO vkgadm
+GO 

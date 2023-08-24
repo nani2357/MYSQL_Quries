@@ -1,0 +1,56 @@
+Query to generate script for shrinking all databases data files
+
+
+use master 
+go 
+set nocount on;
+declare @dbfilename varchar(255), @dbfilesize int, @dbspacefree int, @dbpercentfree decimal(18,2)
+create table #tmpcommand (commandname varchar(2048)) 
+go
+create table #tmpspaceused (dbname nvarchar(255), filenme varchar(255), spaceused float) 
+create table #db (name nvarchar(255)) 
+declare @dbname sysname, @rc int
+declare @cmdsql varchar(2000)
+
+insert into #db (name) select name from master.sys.databases where 
+                     name not in ('master', 'model', 'msdb', 'tempdb') and
+                     name not like '%reportserver%' and
+                     databasepropertyex([name], 'isinstandby') = 0 and
+                     databasepropertyex([name], 'status') = 'online'
+select @rc = 1, @dbname = min(name) from #db
+while @rc <> 0
+       begin
+       set @cmdsql = 'use [' + @dbname + '];' + 'insert into #tmpspaceused (dbname, filenme, spaceused) select ''' + @dbname + ''', name, fileproperty(name, ''spaceused'') from [' + @dbname + '].sys.sysfiles'
+       exec(@cmdsql)
+--select * from #tmpspaceused
+       select top 1 @dbname = name from #db where name > @dbname order by name
+       set @rc = @@rowcount
+       end
+drop table #db
+insert into #tmpcommand(commandname)
+select 'use [' + a.name + '];' + ' dbcc shrinkfile(' + 
+ b.name + ', ' +  cast( ( cast((b.size * 8 / 1024.0) as decimal(18,0)) -  cast((b.size * 8 / 1024.0) - (d.spaceused / 128.0) as decimal(15,0)) + 1 ) as varchar(20) )+ ')' 
+from sys.databases a 
+ join sys.master_files b on a.database_id = b.database_id  
+ join #tmpspaceused d on a.name = d.dbname and b.name = d.filenme 
+--where cast((b.size * 8 / 1024.0) - (d.spaceused / 128.0) as decimal(15,2)) / cast(cast((b.size * 8 / 1024.0) as decimal(18,2)) as varchar(20)) > 0.01
+and b.type_desc ='rows'
+drop table #tmpspaceused 
+declare @printcommand varchar(8000) 
+declare print_cursor cursor for 
+select commandname from #tmpcommand order by commandname 
+open print_cursor  
+fetch next from print_cursor into @printcommand 
+while (@@fetch_status <> -1) 
+begin 
+if (@@fetch_status <> -2) 
+begin 
+print @printcommand
+--exec  @printcommand
+end 
+fetch next from print_cursor into @printcommand 
+end 
+drop table #tmpcommand
+close print_cursor 
+deallocate print_cursor
+

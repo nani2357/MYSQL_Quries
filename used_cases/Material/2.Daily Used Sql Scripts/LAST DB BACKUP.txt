@@ -1,0 +1,70 @@
+This SQL Script will list down all SQL Server backups which were taken in last 10 days with details
+-- Copyright 2012 - DBATAG
+
+
+
+SELECT  
+   CONVERT(CHAR(100), SERVERPROPERTY('Servername')) AS Server, 
+   bs.database_name,  
+   bs.backup_start_date,  
+   bs.backup_finish_date, 
+   bs.expiration_date, 
+   CASE bs.type  
+       WHEN 'D' THEN 'Full Database'  
+       WHEN 'L' THEN 'Log'  
+       WHEN 'I' THEN 'Differential'  
+       WHEN 'F' THEN 'File Level'  
+       WHEN 'G' THEN 'File Level Differential'  
+       WHEN 'P' THEN 'Partial'  
+       WHEN 'Q' THEN 'Differential partial'        
+   END AS backup_type,  
+   convert(varchar,cast(bs.backup_size/1024/1024 as money),10) as 'Backup Size in MB',
+   bmf.logical_device_name,  
+   bmf.physical_device_name,   
+   bs.name AS backupset_name, 
+   bs.description 
+FROM   msdb.dbo.backupmediafamily  bmf
+   INNER JOIN msdb.dbo.backupset bs ON bmf.media_set_id = bs.media_set_id  
+WHERE  (CONVERT(datetime, bs.backup_start_date, 102) >= GETDATE() - 10)  
+ORDER BY  
+   bs.database_name, 
+   bs.backup_finish_date
+
+
+
+
+
+
+
+
+This SQL Script will list down all SQL Server backups which were not backup in last 2 days
+
+
+
+
+SCRIPT TO FIND DATABASES LASTBACKUP HISTORY
+
+SELECT 
+   CONVERT(CHAR(100), SERVERPROPERTY('Servername')) AS Server, 
+   bs.database_name, 
+   MAX(bs.backup_finish_date) AS last_db_backup_date, 
+   DATEDIFF(hh, MAX(bs.backup_finish_date), GETDATE()) AS [Backup Age (Hours)] 
+FROM    msdb.dbo.backupset bs
+WHERE     bs.type = 'D'  
+GROUP BY bs.database_name 
+HAVING      (MAX(bs.backup_finish_date) < DATEADD(hh, - 48, GETDATE()))  
+
+UNION  
+
+--Databases without any backup history 
+SELECT      
+   CONVERT(CHAR(100), SERVERPROPERTY('Servername')) AS Server,  
+   master.dbo.sysdatabases.NAME AS database_name,  
+   NULL AS [Last Data Backup Date],  
+   9999 AS [Backup Age (Hours)]  
+FROM 
+   master.dbo.sysdatabases LEFT JOIN msdb.dbo.backupset bs 
+       ON master.dbo.sysdatabases.name  = bs.database_name 
+WHERE bs.database_name IS NULL AND master.dbo.sysdatabases.name <> 'tempdb' 
+ORDER BY  
+   bs.database_name

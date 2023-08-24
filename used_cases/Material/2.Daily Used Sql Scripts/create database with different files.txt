@@ -1,0 +1,9 @@
+CREATE DATABASE CRE
+ON 
+( NAME = CRE_data,
+    FILENAME = 'E:\mssql\Data\CRE\CRE.mdf'
+)
+LOG ON
+( NAME = CRE_log,
+    FILENAME = 'F:\mssql\Data\CRE\CRE_log.ldf'
+) ;

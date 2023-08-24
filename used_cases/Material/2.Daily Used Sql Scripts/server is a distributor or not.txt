@@ -1,0 +1,16 @@
+ server is a distributor or not?
+
+SELECT @@ServerName Servername, case when is_distributor=1 then 'Yes' else 'No' end status FROM sys.servers WHERE name='repl_distributor' AND data_source=@@servername;
+
+
+Publisher is using this Distributor or not?
+
+EXEC sp_get_distributor
+
+
+Distribution and Distribution Database properties
+
+EXEC sp_helpdistributor;  
+EXEC sp_helpdistributiondb;  
+EXEC sp_helpdistpublisher;
+

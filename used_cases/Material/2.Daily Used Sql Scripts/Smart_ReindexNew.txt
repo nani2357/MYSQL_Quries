@@ -1,0 +1,114 @@
+
+--SQL Server 2005/2008
+
+CREATE TABLE #fraglist (
+   ObjectName char(255),
+   ObjectId int,
+   IndexName char(255),
+   IndexId int,
+   Lvl int,
+   CountPages int,
+   CountRows int,
+   MinRecSize int,
+   MaxRecSize int,
+   AvgRecSize int,
+   ForRecCount int,
+   Extents int,
+   ExtentSwitches int,
+   AvgFreeBytes int,
+   AvgPageDensity int,
+   ScanDensity decimal,
+   BestCount int,
+   ActualCount int,
+   LogicalFrag decimal,
+   ExtentFrag decimal);
+
+
+insert into #fraglist  
+EXEC ('DBCC SHOWCONTIG WITH  TABLERESULTS, ALL_INDEXES');
+select indid,'ALTER INDEX '+ i.name + ' ON '+user_name(u.uid)+'.'+o.name + ' REBUILD 'from sysobjects o join sysusers u on o.uid=u.uid JOIN SYSINDEXES i ON i.id = o.id where o.type = 'U' and i.indid > 0
+and i.name NOT LIKE '_WA_%' 
+and i.name IN (select indexname from  #fraglist where ObjectName not like 'SYS%' and indexid <>0 and scandensity <80 ) 
+order by 1 asc
+
+Drop table #fraglist
+
+
+
+
+--------------------------------------------------------------------------------
+error of collation 2005/2008
+----------------------------------------------------------------------
+CREATE TABLE #fraglist (
+   ObjectName char(255),
+   ObjectId int,
+   IndexName char(255),
+   IndexId int,
+   Lvl int,
+   CountPages int,
+   CountRows int,
+   MinRecSize int,
+   MaxRecSize int,
+   AvgRecSize int,
+   ForRecCount int,
+   Extents int,
+   ExtentSwitches int,
+   AvgFreeBytes int,
+   AvgPageDensity int,
+   ScanDensity decimal,
+   BestCount int,
+   ActualCount int,
+   LogicalFrag decimal,
+   ExtentFrag decimal);
+
+
+insert into #fraglist  
+EXEC ('DBCC SHOWCONTIG WITH  TABLERESULTS, ALL_INDEXES');
+select indid,'ALTER INDEX '+ i.name + ' ON '+user_name(u.uid)+'.'+o.name + ' REBUILD '
+from ESOURCING.sys.sysobjects o join ESOURCING.sys.sysusers u 
+on o.uid =u.uid  
+JOIN ESOURCING.sys.SYSINDEXES i ON i.id = o.id 
+where o.type  = 'U' 
+and i.indid > 0
+and i.name NOT LIKE '_WA_%' 
+and i.name IN (select indexname COLLATE Latin1_General_CI_AS from  #fraglist where ObjectName not like 'SYS%' and indexid <>0 and scandensity <80 ) 
+order by 1 asc
+
+
+
+
+----SQL server 2000
+
+
+CREATE TABLE #fraglist (
+   ObjectName char(255),
+   ObjectId int,
+   IndexName char(255),
+   IndexId int,
+   Lvl int,
+   CountPages int,
+   CountRows int,
+   MinRecSize int,
+   MaxRecSize int,
+   AvgRecSize int,
+   ForRecCount int,
+   Extents int,
+   ExtentSwitches int,
+   AvgFreeBytes int,
+   AvgPageDensity int,
+   ScanDensity decimal,
+   BestCount int,
+   ActualCount int,
+   LogicalFrag decimal,
+   ExtentFrag decimal);
+
+
+insert into #fraglist  
+EXEC ('DBCC SHOWCONTIG WITH  TABLERESULTS, ALL_INDEXES');
+
+select indid,'DBCC DBREINDEX (',+'"'+user_name(u.uid)+'.'+o.name+'" '+','+'"' + i.name +'"'+','+'0'+')',I.ROWS from sysobjects o 
+join sysusers u on o.uid=u.uid JOIN SYSINDEXES i ON i.id = o.id where o.type = 'U' and i.indid > 0 and i.name NOT LIKE '_WA_%' 
+and i.name IN(select indexname from  #fraglist where ObjectName not like 'SYS%' and indexid <>0 and scandensity <80 ) 
+order by 1 asc
+
+Drop table #fraglist

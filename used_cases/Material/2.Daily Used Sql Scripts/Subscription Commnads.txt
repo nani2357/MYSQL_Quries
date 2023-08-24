@@ -1,0 +1,8 @@
+Subscription commands
+
+EXEC sp_helpsubscriberinfo;
+
+
+EXEC sp_helpsubscription;
+
+

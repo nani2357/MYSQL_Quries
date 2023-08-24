@@ -1,0 +1,3 @@
+To list the columns that are published in transactional replication in the publication database, run the following T-SQL
+
+SELECT object_name(object_id) [published table], name [published column] FROM sys.columns sc WHERE sc.is_replicated = 1;

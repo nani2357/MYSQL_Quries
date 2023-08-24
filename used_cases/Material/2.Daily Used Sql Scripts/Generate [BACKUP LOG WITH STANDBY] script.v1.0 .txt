@@ -1,0 +1,88 @@
+
+
+------------------------------------------------------------------------------------
+--Take log backup with standby
+------------------------------------------------------------------------------------
+SET NOCOUNT ON
+
+
+Declare @BackupPath as varchar(100)
+Declare @db_name as varchar(100)
+
+-----------CHANGE HERE --------------------
+set @BackupPath = 'I:\MSSQL\BACKUP\EHRIS' 					-- database backup path.
+set @db_name =  'EHRIS'
+--------------------------------------------
+
+DECLARE @BackupFile as VARCHAR(250)
+DECLARE @UndoFile as VARCHAR(250)
+DECLARE @SQLSTR AS NVARCHAR(500)
+DECLARE @DateTime as VARCHAR(50)
+DECLARE @YYYY AS VARCHAR(4)
+DECLARE @M AS VARCHAR(2)
+DECLARE @D AS VARCHAR(2)
+DECLARE @HH AS VARCHAR(2)
+DECLARE @MIN AS VARCHAR(2)
+
+IF CAST(serverproperty ('ProductVersion') AS VARCHAR(1)) = '8'
+BEGIN          
+		--*** CREATING DATE PART
+		SET @YYYY =  DATEPART(YYYY, GETDATE())
+
+		SET @M = DATEPART(m, GETDATE())
+		IF @M BETWEEN 1 AND 9
+		   SET @M = '0'+@M
+
+		SET @D =  DATEPART(d, GETDATE())
+		IF @D BETWEEN 1 AND 9
+		   SET @D = '0'+@D
+
+		SET @HH =  DATEPART(HH, GETDATE())
+		IF @HH BETWEEN 0 AND 9
+		   SET @HH = '0'+@HH
+
+		SET @MIN =  DATEPART(MINUTE, GETDATE())
+		IF @MIN BETWEEN 0 AND 9
+		   SET @MIN = '0'+@MIN
+
+        SET @DateTime =  @YYYY + @M + @D + @HH + @MIN 
+        SET @BackupFile = @BackupPath+ '\' + @db_name + '_tlog_' +  @DateTime + '.TRN'
+        SET @UndoFile = @BackupPath+ '\' + @db_name + '_undo_' +  @DateTime + '.dat'
+
+END
+ELSE
+BEGIN          
+		--*** CREATING DATE PART
+		SET @YYYY =  DATEPART(YYYY, GETUTCDATE())
+
+		SET @M = DATEPART(m, GETUTCDATE())
+		IF @M BETWEEN 1 AND 9
+		   SET @M = '0'+@M
+
+		SET @D =  DATEPART(d, GETUTCDATE())
+		IF @D BETWEEN 1 AND 9
+		   SET @D = '0'+@D
+
+		SET @HH =  DATEPART(HH, GETUTCDATE())
+		IF @HH BETWEEN 0 AND 9
+		   SET @HH = '0'+@HH
+
+		SET @MIN =  DATEPART(MINUTE, GETUTCDATE())
+		IF @MIN BETWEEN 0 AND 9
+		   SET @MIN = '0'+@MIN
+
+        SET @DateTime =  @YYYY + @M + @D + @HH + @MIN + '00'
+        SET @BackupFile = @BackupPath+ '\' + @db_name + '_' +  @DateTime + '.trn'
+        SET @UndoFile = @BackupPath+ '\' + @db_name + '_undo_' +  @DateTime + '.dat'
+
+END
+
+	PRINT 'BACKUP LOG [' + @db_name + '] TO DISK = ''' + @BackupFile +'''  WITH STANDBY = ''' + @UndoFile +''' , STATS = 25'                        
+
+
+
+
+
+
+
+

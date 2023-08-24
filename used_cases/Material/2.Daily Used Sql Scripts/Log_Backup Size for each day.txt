@@ -1,0 +1,7 @@
+select CONVERT(char(11), backup_start_date) as 'Backup Date',Database_Name as 'Database Name',((sum(backup_size)/1024)/1024) as 'Backup Size',type from msdb..backupset
+where Database_Name = 'CMOG'
+and
+type = 'L'
+and  backup_start_date between 'June  1 2012' and 'Aug 14 2012'
+group by CONVERT(char(11), backup_start_date),Database_name,type
+order by CONVERT(char(11), backup_start_date)

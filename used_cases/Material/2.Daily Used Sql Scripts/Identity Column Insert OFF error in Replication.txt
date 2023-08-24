@@ -1,0 +1,16 @@
+Identity Insert OFF error in Replicaiton
+
+Please run the below query on Sub to fix the above issue
+
+DECLARE @ApplicableObjectID INT
+SET @ApplicableObjectID = OBJECT_ID('Give Table name here')
+EXEC sp_identitycolumnforreplication @ApplicableObjectID,1
+
+Example
+
+Cannot insert explicit value for identity column in table 'Approval' when IDENTITY_INSERT is set to OFF.
+
+Solution.. run below query on subscriber
+DECLARE @ApplicableObjectID INT
+SET @ApplicableObjectID = OBJECT_ID('Approval')
+EXEC sp_identitycolumnforreplication @ApplicableObjectID,1

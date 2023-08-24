@@ -1,0 +1,30 @@
+ALL EXECUTE QUERIES IN SERVER
+
+SELECT
+deqs.last_execution_time AS [Time], dest.TEXT AS [Query]
+FROM
+sys.dm_exec_query_stats AS deqs
+CROSS
+APPLY sys.dm_exec_sql_text(deqs.sql_handle) AS dest
+ORDER
+BY deqs.last_execution_time DESC
+
+Table Space
+select a.name as Table_name,
+c.rows as Row_count,
+SUM(d.total_pages) * 8 as 'Total Space(KB)',
+SUM(d.used_pages) * 8 as 'Used Space (KB)',
+SUM((d.total_pages - d.used_pages) * 8) as 'UnUsed Space (KB)'
+from sys.tables a inner join
+sys.indexes b on a.object_id = b.object_id
+and a.name not like 'dt%'
+and a.object_id > 255
+inner join sys.partitions c
+on a.object_id = c.object_id
+and b.index_id = c.index_id
+inner join sys.allocation_units d
+on c.partition_id = d.container_id
+--where
+--a.name = 'SSINSTAL'
+group by a.name, c.rows
+go

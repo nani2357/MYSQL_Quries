@@ -1,0 +1,14 @@
+To list all the articles that are published, run the following T-SQL
+
+SELECT
+     Pub.[publication]    [PublicationName]
+    ,Art.[publisher_db]   [DatabaseName]
+    ,Art.[article]        [Article Name]
+    ,Art.[source_owner]   [Schema]
+    ,Art.[source_object]  [Object]
+FROM
+    [distribution].[dbo].[MSarticles]  Art
+    INNER JOIN [distribution].[dbo].[MSpublications] Pub
+        ON Art.[publication_id] = Pub.[publication_id]
+ORDER BY
+    Pub.[publication], Art.[article]

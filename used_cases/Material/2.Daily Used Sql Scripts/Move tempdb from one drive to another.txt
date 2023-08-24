@@ -1,0 +1,38 @@
+SELECT name as 'File Name', physical_name as 'File Directory'
+FROM sys.master_files
+WHERE database_id = DB_ID('tempdb');
+GO
+/*
+tempdev	E:\MSSQL10.MSSQLSERVER\MSSQL\DATA\tempdb.mdf
+templog	E:\MSSQL10.MSSQLSERVER\MSSQL\DATA\templog.ldf
+tempdev1	E:\MSSQL10.MSSQLSERVER\MSSQL\DATA\tempdev1.ndf
+*/
+
+select growth,
+       name,filename,
+       size*8.0*1024/(1024*1024) as TotalMB,
+       fileproperty(name,'SpaceUsed')*8.0*1024/(1024*1024) as UsedMB,
+       size*8.0*1024/(1024*1024) -
+       fileproperty(name,'SpaceUsed')*8.0*1024/(1024*1024) as FreeMB
+from
+       sysfiles
+where
+       (status & 0x2) <> 0
+
+-- dbcc shrinkfile(filename,100)
+
+/*
+----USE master;
+----GO
+----ALTER DATABASE tempdb 
+----MODIFY FILE (NAME = tempdev, FILENAME = 'G:\MSSQL10.MSSQLSERVER\MSSQL\DATA\tempdb.mdf');
+----GO
+----ALTER DATABASE tempdb 
+----MODIFY FILE (NAME = tempdev1, FILENAME = 'G:\MSSQL10.MSSQLSERVER\MSSQL\DATA\tempdev1.ndf');
+----GO
+----ALTER DATABASE  tempdb 
+----MODIFY FILE (NAME = templog, FILENAME = 'G:\MSSQL10.MSSQLSERVER\MSSQL\DATA\templog.ldf');
+----GO
+*/
+
+-- Now move the files to the new location and start stop the sql services.

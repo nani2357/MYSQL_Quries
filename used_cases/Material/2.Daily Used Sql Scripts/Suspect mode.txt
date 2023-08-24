@@ -1,0 +1,13 @@
+----This is for SQL 2005/2008
+
+--EXEC sp_resetstatus 'test_dr';
+
+--ALTER DATABASE test_dr SET EMERGENCY
+
+--DBCC checkdb('test_dr')
+
+--DBCC CheckDB ('test_dr', REPAIR_ALLOW_DATA_LOSS)
+
+--ALTER DATABASE test_dr SET MULTI_USER
+
+--DBCC CheckDB ('test_dr')

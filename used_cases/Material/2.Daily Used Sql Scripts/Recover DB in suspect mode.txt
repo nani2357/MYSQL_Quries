@@ -1,0 +1,18 @@
+
+1) Step 1
+     EXEC sp_resetstatus 'DBname';
+
+
+2) Step 2
+     ALTER DATABASE DBname SET EMERGENCY
+     DBCC checkdb('DBname')
+
+
+3) Step 3
+    ALTER DATABASE DBname SET SINGLE_USER WITH ROLLBACK IMMEDIATE
+    DBCC CheckDB ('DBname', REPAIR_ALLOW_DATA_LOSS)
+
+
+4) Step 4
+    ALTER DATABASE DBname SET MULTI_USER
+

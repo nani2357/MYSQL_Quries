@@ -1,0 +1,16 @@
+N:\SQL_Backup
+
+BACKUP DATABASE OperationsManagerDW TO  
+DISK = 'E:\SQL_Backup\Operatinsmanager_file1.bak', 
+DISK = 'E:\SQL_Backup\operatinsmanager_file2.bak', 
+DISK = 'N:\SQL_Backup\Operatinsmanager_file3.bak'
+WITH INIT , NAME = 'Northwind backup',  STATS = 10
+
+
+SQL_Backup
+
+
+Restore database OperationsManagerDW
+from disk='F:\SQL_Backup\Operatinsmanager_file1.bak'
+     disk='F:\SQL_Backup\operatinsmanager_file2.bak'
+     disk='N:\SQL_Backup\Operatinsmanager_file3.bak', with norecovery

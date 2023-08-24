@@ -1,0 +1,16 @@
+USE PublisherDB
+GO
+
+SELECT sub.srvname, -- Subscriber Server name 
+       sub.dest_db, -- Subscriber Database Name
+       pub.name, -- Publication name
+       art.name, -- Article name
+       art.dest_table, -- Published Object name
+       art.dest_owner -- Published Schema name
+FROM   sysextendedarticlesview art 
+       INNER JOIN syspublications pub 
+               ON ( art.pubid = pub.pubid ) 
+       INNER JOIN syssubscriptions sub 
+               ON ( sub.artid = art.artid ) 
+
+GO

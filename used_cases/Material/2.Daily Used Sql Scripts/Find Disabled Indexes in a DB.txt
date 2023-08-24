@@ -1,0 +1,12 @@
+To find disabled indexes
+
+Use Database_name
+select
+    sys.objects.name as table_name,
+    sys.indexes.name as index_name
+from sys.indexes
+    inner join sys.objects on sys.objects.object_id = sys.indexes.object_id
+where sys.indexes.is_disabled = 1
+order by
+    sys.objects.name,
+    sys.indexes.name

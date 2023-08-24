@@ -1,0 +1,24 @@
+Daily activities of DBAs
+
+1. we have to collect shift handover
+no incidents
+closed incidents
+pending incidents
+any road blocks
+
+2. Rota(Rotational Shift chart)
+
+3. Emails(Outlook)
+check the mails.
+(Service Now--SNOW)--Ticketing Tool--Jeera
+Email from other emp.
+Drive Space issues Tickets
+JOb Failures
+Full backup job
+log backup job
+indexing job
+update statistics job
+DBCC checkdb
+
+Global Support team
+

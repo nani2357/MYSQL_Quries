@@ -1,0 +1,2 @@
+rename PendingFileRenameOperations to PendingFileRenameOperations1 in:
+HKLM\System\CurrentControlSet\Control\SessionManager\

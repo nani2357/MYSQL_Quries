@@ -1,0 +1,20 @@
+select 'UPDATE STATISTICS '+user_name(uid)+'.['+name+ '] WITH FULLSCAN' from sysobjects where type ='U'
+
+
+--TABLE WISE
+
+select 'UPDATE STATISTICS '+user_name(uid)+'.['+name+ '] WITH FULLSCAN' from sysobjects where type ='U'
+and name in('dbo.tblObjectType3_1',
+
+'TblInteraction',
+'tblInteraction_BounceBackDetails',
+'tblInteraction_EscalationDetails',
+'tblInteraction_QuickKillReOpenRemarks',
+'tblInteraction_TeamTAT',
+'tblInteraction_TotalTAT',
+'tblInteraction_Trans',
+'TblInteractionTeamTATMaster',
+'TblInteractionTotalTATMaster',
+'TblLocationMappingForFlow',
+'TblUser'
+) 

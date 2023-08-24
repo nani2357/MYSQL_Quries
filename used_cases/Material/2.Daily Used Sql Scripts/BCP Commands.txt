@@ -1,0 +1,22 @@
+We can use BCP utility to export and import data. It is the fastest way to export or import data from SQL. It is useful in Indices refreshes. Below are some sample commands. Please let me know if anything is not clear.
+
+exec master..xp_cmdshell 'bcp DATA.dbo.tbl_membership_class out C:\bcp_outputTable.txt -SLON2PDIDXPRD03\LON2PDIDXPRD03 -T -c'  --- To export
+exec master..xp_cmdshell 'bcp data.dbo.tbl_Membership_Class in C:\bcp_outputTable.txt -SLON2QAIDXPRD23\LON2QAIDXPRD23 -T -c -b 100'  --- To import
+
+
+
+exec master..xp_cmdshell 'bcp data.dbo.esgdata out M:\LOG\VOL01\tablebackup_6th_Sept_2020\iat11esgdata.txt -SLNP6qaIDXiat11\LNP6qaIDXiat11 -T -c'
+exec master..xp_cmdshell 'bcp data.dbo.esgattributedata out M:\LOG\VOL01\tablebackup_6th_Sept_2020\iat11esgattributedata.txt -SLNP6qaIDXiat11\LNP6qaIDXiat11 -T -c'
+
+exec master..xp_cmdshell 'bcp data.dbo.esgdata in  M:\LOG\VOL01\tablebackup_6th_Sept_2020\iat11esgdata.txt -SLNP6qaIDXiat11\LNP6qaIDXiat11 -T -c -b 100'
+exec master..xp_cmdshell 'bcp data.dbo.esgattributedata in  M:\LOG\VOL01\tablebackup_6th_Sept_2020\iat11esgattributedata.txt -SLNP6qaIDXiat11\LNP6qaIDXiat11 -T -c -b 100'
+
+exec master..xp_cmdshell 'bcp data.dbo.esgattributedata in  M:\LOG\VOL01\esgattributedata.txt -SLON6DVIDXRND01\LON6DVIDXRND01 -T -c -b 100'
+
+
+
+exec master..xp_cmdshell 'bcp data.dbo.esgdata out I:\BACKUP\VOL02\TableBackup_06spt\prd13esgdata.txt -SLNP6qaIDXprd13\LNP6qaIDXprd13 -T -c'
+exec master..xp_cmdshell 'bcp data.dbo.esgattributedata out I:\BACKUP\VOL02\TableBackup_06spt\prd13esgattributedata.txt -SLNP6qaIDXprd13\LNP6qaIDXprd13 -T -c'
+
+exec master..xp_cmdshell 'bcp data.dbo.esgdata in  I:\BACKUP\VOL02\TableBackup_06spt\prd13esgdata.txt -SLNP6qaIDXprd13\LNP6qaIDXprd13 -T -c -b 100'
+exec master..xp_cmdshell 'bcp data.dbo.esgattributedata in  I:\BACKUP\VOL02\TableBackup_06spt\prd13esgattributedata.txt -SLNP6qaIDXprd13\LNP6qaIDXprd13 -T -c -b 100'

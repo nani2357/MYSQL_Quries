@@ -1,0 +1,30 @@
+To check if the table is part of replication or not
+
+
+select is_published,* from sys.tables
+
+
+where name in (
+'tbx_Doc_Routing_Entitlements',
+'tbx_User_Security_Profiles',
+'tbx_acct_contacts'
+)
+
+
+--To be run on Publisher
+
+
+SELECT seav.artid as [Article ID], 
+           seav.name as [Article Name], 
+           sp.name as [Publication Name]
+FROM dbo.sysextendedarticlesview seav inner join
+        dbo.syspublications sp on sp.pubid = seav.pubid
+        Where seav.name like '%tbx_Doc_Routing_Entitlements%'
+        or seav.name like '%tbx_User_Security_Profiles%'
+        or seav.name like '%tbx_acct_contacts%'
+ORDER BY 2
+
+
+
+
+

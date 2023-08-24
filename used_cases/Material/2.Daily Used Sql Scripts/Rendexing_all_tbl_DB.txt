@@ -1,0 +1,59 @@
+						RE-INDEXING  ACTIVITY 
+					-------------------------------------------
+
+Sp_spaceused 'tablename'
+
+sp_helpindex 'tablename'
+
+-------------Reindexing for all tables.
+
+EXEC sp_MSforeachtable @command1="print '?' DBCC DBREINDEX ('?', ' ', 0)"	
+
+
+
+For SQL 2000
+-------------
+select indid,'DBCC DBREINDEX (',+'"'+user_name(u.uid)+'.'+o.name+'" '+','+'"' + i.name +'"'+','+'0'+')',I.ROWS from sysobjects o 
+join sysusers u on o.uid=u.uid JOIN SYSINDEXES i ON i.id = o.id where o.type = 'U' and i.indid > 0 and i.name NOT LIKE '_WA_%' 
+and i.name IN('indexname') --order by i.rows desc
+
+
+SQL 2005/2008
+---------------
+select indid,'ALTER INDEX ',+ i.name + ' ON '+user_name(u.uid)+'.'+o.name + ' REBUILD 'from sysobjects o join sysusers u on o.uid=u.uid JOIN SYSINDEXES i ON i.id = o.id where o.type = 'U' and i.indid > 0
+and i.name NOT LIKE '_WA_%' 
+and i.name IN ('indexname') --order by i.rows desc
+
+
+ONLINE REINDEXING FOR all tables for sql 2005/2008
+----------------------------------------------------
+
+select 'ALTER INDEX ',+ i.name + ' ON '+user_name(u.uid)+'.'+o.name + ' REBUILD with (ONLINE = ON)'from sysobjects o join sysusers u on o.uid=u.uid JOIN SYSINDEXES i ON i.id = o.id where o.type = 'U' and i.indid > 0
+and i.name NOT LIKE '_WA_%'
+and i.name in (Tablename)
+
+
+Note : ONLINE option in ALTER INDEX is only available in Ent. Ed. of sql server 2005.
+
+
+sp_spaceused FOR ALL TABLES.
+------------------------------
+select 'sp_spaceused "'+user_name(uid)+'.'+o.name+'"' from sysobjects o 
+where o.name in ( )
+
+
+DBCC SHOWCONTIG for Database 
+------------------------------
+dbcc showcontig with tableresults,all_indexes
+
+
+DBCC SHOWCONTIG FOR SELECTED TABLES.
+---------------------------------------
+select 'DBCC SHOWCONTIG (',+'"'+user_name(u.uid)+'.'+o.name +'") WITH TABLERESULTS, ALL_INDEXES' from sysobjects o join sysusers u on o.uid=u.uid 
+where  o.name in ()
+
+
+UPDATE STATISTICS
+-------------------
+select 'UPDATE STATISTICS '+user_name(uid)+'.'+name+ ' WITH FULLSCAN' from sysobjects where type ='U'and name IN (tablename)
+select 'UPDATE STATISTICS '+user_name(uid)+'.'+name+ ' WITH FULLSCAN' from sysobjects where type ='U'

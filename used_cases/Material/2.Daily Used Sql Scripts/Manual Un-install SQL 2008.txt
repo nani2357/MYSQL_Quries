@@ -1,0 +1,5 @@
+Manually Un-install SQL 2008:
+
+CD %ProgramFiles%\Microsoft SQL Server\100\Setup Bootstrap\Release
+
+setup.exe/Action=uninstall/FEATURES=SQL,SQLEngine,Replication,FullText/INSTANCENAME=MSSQLSERVER

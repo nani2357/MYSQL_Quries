@@ -1,0 +1,8 @@
+
+If you want to execute same command in all the databases you can use below query.. 
+Note: Edit the query in EXEC() brackets. No need to change anything.
+
+DECLARE @command varchar(1000) 
+SELECT @command = 'IF ''?'' NOT IN(''master'', ''model'', ''msdb'', ''tempdb'') BEGIN USE ? 
+   EXEC('' grant showplan to Test'') END' 
+EXEC sp_MSforeachdb @command

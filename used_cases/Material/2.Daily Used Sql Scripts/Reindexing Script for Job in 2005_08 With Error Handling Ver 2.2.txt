@@ -1,0 +1,215 @@
+-- =====================================================================================================================================
+--  this online indexing script checks all indexes in the current database and performs either offline or online defragmentation
+--    according to the specified thresholds.
+--  the script also updates statistics for indexes in which the last update time is older than the specified threshold.
+--  available variables for changing thresholds are:
+--      @rebuildthreshold: 
+--				specifies minimum percentage of fragmentation that qualifies to perform online reindexing or defragmentation (default 5%).
+--      @defragthreshold: 
+--				specifies maximum percentage of fragmentation to perform online defragmentation (default 10%).
+--   note: if @rebuildthreshold and @defragthreshold are equal it will do online reindexing for all the qualifying indexes for that percent value.
+--
+--      @updatestatsthreshold: 
+--				specifies the number of days since the last statistics update which should trigger updating statistics (default 7 days).
+--
+--
+-- created by: sanjay raut (microsoft pfe)
+--		script version = v 2.0
+-- modifications done in version 1.1
+--			added quoted identifiers quotename() for table, index and statistic names to avoid special char or space issue.
+-- modifications done in version 2.0 are
+--		1>	the option “limited” has been changed to “sampled”. 
+--		2>	the hard coded values of rebuild threshold and defrag threshold have been removed.
+--			2 variables are introduced in the script to tweak this value as we want
+--		3>	the defragmentation default threshold is changed from 30% to 10%. 
+--			that means if the defragmentation percent 
+--			is greater than 5% and less than 10% then defragmentation of those indexes will be done
+--		4>	with proper tweaking of these threshold values we can now skip defragmentation completely if business needs to do so.
+--		5>	the error reporting is improved in a way so that we can copy paste the offline reindexing commands from 
+--			the script output to another weekly job where those indexes can be rebuilt offline with downtime. 
+--			it is important that these commands are regularly updated in the job so that offline reindexing will 
+--			regularly happen on those indexes.
+-- =====================================================================================================================================
+
+-- please change the <database_name> below to appropriate user database on which the script should run.
+
+use 
+go
+set ansi_nulls on
+go
+set quoted_identifier on
+go
+set nocount on
+go
+
+declare 
+      @rebuildthreshold float,
+      @defragthreshold float,
+      @updatestatsthreshold int
+
+
+-- please change the following thresholds if needed. both defragthreshold are in percent while @updatestatsthreshold is in number of days
+-- if @rebuildthreshold and @defragthreshold are equal it will do online reindexing for all the qualifying indexes for that percent value.
+
+select
+      @rebuildthreshold = 5.0,
+      @defragthreshold = 10.0,
+      @updatestatsthreshold = 7
+      
+      declare @objectid int,
+			  @indexid int,
+			  @frag float,
+			  @command varchar(8000),
+			  @schemaname sysname,
+			  @objectname sysname,
+			  @indexname sysname,
+			  @errornumber bigint,
+			  @errorseverity int, 
+			  @errorstate int,
+			  @errorprocedure nvarchar(126), 
+			  @errorline int, 
+			  @errormessage nvarchar(2048)
+			  
+
+
+      create table #allindexes (objectid int, indexid int, fragmentation float)
+      create table #errordetails (errornumber int, errorseverity int, errorstate int, errorprocedure nvarchar(126), errorline int, errormessage nvarchar(2048),commandtoexecute varchar(8000))
+      
+      declare @currentddbid int
+      declare @currentddbname sysname      
+      select @currentddbid = db_id(), @currentddbname = db_name()
+      
+      insert into #allindexes
+      select 
+            object_id, index_id, avg_fragmentation_in_percent 
+      from sys.dm_db_index_physical_stats (@currentddbid, null, null , null, 'sampled')
+      where index_id > 0
+		union
+      select
+			ss.object_id, ss.stats_id as index_id,0 
+      from sys.stats  ss left join sys.indexes si
+           on ss.object_id = si.object_id
+           and ss.stats_id = si.index_id
+      where si.index_id is null
+      and ss.object_id > 1000
+
+	  create index idx on #allindexes(fragmentation desc)
+      declare indexestodefrag cursor for select * from #allindexes order by fragmentation desc
+
+      open indexestodefrag;
+
+      -- loop through the partitions.
+      fetch next
+         from indexestodefrag
+         into @objectid, @indexid, @frag;
+
+      while @@fetch_status = 0
+            begin
+
+            select @schemaname = s.name
+            from sys.objects as o
+            join sys.schemas as s on s.schema_id = o.schema_id
+            where o.object_id = @objectid
+
+            select @indexname = name 
+            from sys.indexes
+            where  object_id = @objectid and index_id = @indexid
+
+            if @frag > @rebuildthreshold
+            begin 
+                  if @frag < @defragthreshold
+                        begin;
+                              select @command = 'alter index ' + quotename(@indexname) + ' on ' + quotename(@schemaname) + '.' + quotename(object_name(@objectid)) + ' reorganize'
+                              exec (@command)
+                        end;
+
+                  else
+                        begin;
+								begin try
+									select @command = 'alter index ' + quotename(@indexname) +' on ' + quotename(@schemaname) + '.' + quotename(object_name(@objectid)) + ' rebuild with (online=on)'
+									print 'starting ' + @command
+									exec (@command)
+								end try
+								begin catch
+									select
+											@errornumber = error_number(),
+											@errorseverity = error_severity(),
+											@errorstate = error_state(),
+											@errorprocedure = error_procedure(),
+											@errorline = error_line(),
+											@errormessage = error_message();
+
+
+									if @errornumber = 2725
+									begin
+										select @command = 'alter index ' + quotename(@indexname) +' on ' + quotename(@schemaname) + '.' + quotename(object_name(@objectid)) + ' rebuild with (online=off)'
+									end
+									else
+									begin
+										select @command = 'there is different error than 2725. please check [' + @indexname +'] on [' + @schemaname + '].[' + object_name(@objectid) + '] before rebuilding it'
+									end
+									insert into #errordetails 
+									values (@errornumber, @errorseverity, @errorstate, @errorprocedure, @errorline, @errormessage, @command)
+								end catch
+                        end;
+                  print 'complete ' + @command
+            end
+
+            if stats_date(@objectid, @indexid) < dateadd(dd, -@updatestatsthreshold, getdate())
+            begin
+	              select @indexname = name 
+				  from sys.stats
+				  where  object_id = @objectid and stats_id = @indexid
+
+                  select @command = 'update statistics ' + quotename(@schemaname) + '.' + quotename(object_name(@objectid)) + ' ' + quotename(@indexname) +' with resample'
+                  print 'starting ' + @command
+                  exec (@command)
+
+                  print 'complete ' + @command
+            end
+
+
+            fetch next from indexestodefrag into @objectid, @indexid, @frag
+
+      end
+
+      close indexestodefrag;
+      deallocate indexestodefrag;
+
+	  if exists(select 1 from #errordetails)
+	  begin
+	  
+	  	  if exists(select 1 from #errordetails where errornumber = 2725)
+	  	  begin
+			print '-----------------------------------------------------------------------------------------------------------------'
+			print '---------                        following indexes need to be built offline                           -----------'
+			print '-----------------------------------------------------------------------------------------------------------------'
+
+			select commandtoexecute from #errordetails 
+			where errornumber = 2725
+		  end
+
+	  	  if exists(select 1 from #errordetails where errornumber <> 2725)
+		  begin
+			print '-----------------------------------------------------------------------------------------------------------------'
+			print '---------               there could be some other issues for following indexes please check           -----------'
+			print '-----------------------------------------------------------------------------------------------------------------'
+
+			select * from #errordetails 
+			where errornumber <> 2725
+			order by errornumber
+		  end
+	  end
+			
+      drop table #allindexes
+      drop table #errordetails
+
+			print '-----------------------------------------------------------------------------------------------------------------'
+			print '-------------------------------------- script completed successfully on ' + @currentddbname + '  --'
+			print '-----------------------------------------------------------------------------------------------------------------'
+
+-------------- end script ---------------------------------------------
+
+
+
+

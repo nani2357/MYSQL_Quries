@@ -1,0 +1,17 @@
+SQL Server 2005 adds additional shrink logic to compress TEXT/IMAGE data, referred to as LOBs.     The dbcc shrink* code uses the same underlying methods that ALTER INDEX .... WITH (LOB_COMPACTION ON) uses to compact the LOB space in the database files.   
+
+There are various stages of dbcc shrink* activity.   These stages are indicated in the sys.dm_exec_requests command column along with the progress indications. 
+
+
+1 DbccSpaceReclaim 
+
+ Clean up deferred allocations and purge empty extents preparing for data moves.   
+ 
+2 DbccFilesCompact 
+ Moves pages beyond the target to before the target and truncate file as required. 
+ 
+3 DbccLOBCompact 
+ Compacting the LOB data. 
+
+
+http://blogs.msdn.com/b/psssql/archive/2008/03/28/how-it-works-sql-server-2005-dbcc-shrink-may-take-longer-than-sql-server-2000.aspx

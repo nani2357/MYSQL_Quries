@@ -1,0 +1,595 @@
+'===========================================
+Database Properties
+'===========================================
+sp_helpdb
+
+or
+
+sp_helpdb database_name
+
+or
+
+SELECT db.name AS database_name,
+sp.name AS owner,
+db.create_date,
+db.compatibility_level,
+db.recovery_model_desc
+FROM sys.databases db INNER JOIN sys.server_principals sp
+ON db.owner_sid = sp.sid
+
+'===========================================
+Reset Login Password
+'===========================================
+alter login pruomni with password = 'test@123'
+
+'===========================================
+Check tables in database
+'===========================================
+
+select * from sys.tables
+
+'===========================================
+Check Index Fragmentation
+'===========================================
+
+dbcc showcontig with tableresults,all_indexes
+
+'===========================================
+
+USE [master]
+GO
+ALTER DATABASE [CORDYS_BOP4] MODIFY FILE ( NAME = N'CORDYS_BOP4_log', FILENAME = ' new_path/os_file_name ')
+GO
+
+'===========================================
+
+Wega Restore Check
+
+select top 10 * from ledger order by udt desc
+
+sp_change_users_login 'update_one','gis','gis'
+
+10.24.149.36
+
+Error:
+Msg 3101, Level 16, State 1, Line 1
+Exclusive access could not be obtained because the database is in use.
+Msg 3013, Level 16, State 1, Line 1
+RESTORE DATABASE is terminating abnormally.
+
+Action:
+sp_helpdb --check for GISPRODUCTUON_MMDDYY dbid
+
+ALTER DATABASE Honeybee_New MODIFY NAME = Honeybee_235
+
+select * from master..sysprocesses where dbid=11
+
+kill process id accessing GISPRODUCTUON_MMDDYY
+
+'===========================================
+blockages
+'===========================================
+select * from master..sysprocesses where spid > 50 and blocked <> 0 and spid <> blocked
+
+Total Connections
+================
+select * from sys.dm_exec_connections
+
+Blockedge <> 0
+=============
+select lastwaittype,cmd,(select text from sys.dm_exec_sql_text(a.sql_handle)) as query,* from sysprocesses a where blocked <> 0
+
+Top Query
+=========
+select dc.client_net_address,a.session_id,sp.blocked,sp.cmd,(select text from sys.dm_exec_sql_text(a.sql_handle)) as Query
+from sys.dm_exec_connections dc inner join sys.dm_exec_requests a on a.connection_id = dc.connection_id inner join sysprocesses sp on a.session_id = sp.spid
+
+'===========================================
+Kill SPID in bulk
+'=========================================== 
+
+select 'kill ',spid from sysprocesses where spid > 50 and status = 'sleeping'
+
+'===========================================
+Mapping user
+'===========================================
+sp_change_users_login 'update_one','ipru','ipru'
+
+'===========================================
+LOG Space Size Details
+'===========================================
+dbcc sqlperf ('Logspace')
+'===========================================
+Shrink DB
+'===========================================
+USE DatabaseName
+ GO
+ DBCC SHRINKFILE(<TransactionLogName>, 1)
+ BACKUP LOG <DatabaseName> WITH TRUNCATE_ONLY
+ DBCC SHRINKFILE(<TransactionLogName>, 1)
+ GO 
+
+'===========================================
+LOG Space Size Details
+'===========================================
+sp_spaceUsed
+
+'===========================================
+Indexing Report	
+'===========================================
+DBCC SHOW_STATISTICS ( 'calllog','calllog1')
+
+'===========================================
+Full & Diffrential BackUp Details
+'===========================================
+select database_name,backup_start_date,backup_finish_date from msdb..backupset
+where backup_start_date >= '2013-04-03 00:00:00.000' and type='D'
+order by backup_start_date desc
+
+or Combined query full/diff
+select type,database_name,backup_start_date,backup_finish_date
+,cast((backup_size/1024/1024/1024) as numeric(1711111000,2))
+from msdb..backupset
+where backup_start_date >= '2012-11-08 00:00:00.000' and type='D' or type='I'
+order by backup_start_date desc
+
+or
+
+
+
+SELECT database_name, type, backup_start_date, backup_finish_date, first_lsn, Last_LSN, backup_size/1024/1024 as "Backup_Size"
+from msdb..backupset 
+where convert(varchar(8),backup_start_date,112) > convert(varchar(8),getdate()- 5,112)
+AND TYPE <> 'L' order by backup_start_date
+go
+
+
+
+
+
+or % Backup / Restore completed
+
+select Start_time,percent_complete, (select text from sys.dm_exec_sql_text(a.SQL_HANDLE)) 
+from sys.dm_exec_requests a where session_id=103
+
+Estimate Time Complete for Backup/restore completion
+=====================
+SELECT
+	session_id,
+	start_time,
+	status,
+	command,
+	percent_complete,
+	estimated_completion_time,
+	estimated_completion_time /60/1000 as estimate_completion_minutes,
+	--(select convert(varchar(5),getdate(),8)),
+	DATEADD(n,(estimated_completion_time /60/1000),GETDATE()) as estimated_completion_time
+FROM    sys.dm_exec_requests where command = 'BACKUP DATABASE' OR command = 'RESTORE DATABASE'
+
+'===========================================
+TRN BackUp Details
+'===========================================
+SELECT database_name, type, backup_start_date, backup_finish_date, first_lsn, Last_LSN, backup_size/1024/1024 as "Backup_Size"
+from msdb..backupset 
+where convert(varchar(8),backup_start_date ,112) > convert(varchar(8),getdate()- 30,112)
+AND TYPE = 'L' order by backup_start_date desc
+go
+
+'============================================
+Total TRn Size for 24 hours
+'============================================
+SELECT database_name ,sum(backup_size/1024/1024) as "Backup_Size"
+from msdb..backupset 
+where convert(varchar(8),backup_start_date ,112) = convert(varchar(8),getdate()- 1,112)
+AND TYPE = 'L' 
+group by database_name
+go
+
+
+'===========================================
+Logshipping status
+'===========================================
+select * from msdb..log_shipping_monitor_secondary order by secondary_server
+
+select * from msdb..log_shipping_monitor_history_detail order by log_time --- SQL SERVER 2005
+
+select * from msdb..log_shipping_monitor_history_detail where message like 'The restore %'  and database_name<>'null' and convert(varchar(8),log_time ,112) = convert(varchar(8),getdate()- 0,112) order by log_time desc
+
+select * from MSDB..log_shipping_plan_history order by last_file desc --- SQL SERVER 2000
+
+'================================================
+For Getting database physical path
+'================================================
+select * from dbo.backupmediafamily where physical_device_name like '%.bak'
+
+'================================================
+For getting the last log restored
+================================================
+select * from log_shipping_monitor_secondary
+
+'===================================================
+For getting the size of the MDF and LDF Files and the growth factor
+====================================================
+SELECT sysfiles.fileid, (sysfiles.size*8/1024) AS 'size', sysfiles.maxsize, sysfiles.growth, sysfiles.status, sysfiles.name, sysfiles.filename  FROM Extranet.dbo.sysfiles sysfiles
+
+--------------------------------------------------
+
+SELECT     TOP 100 PERCENT database_name, server_name, backup_start_date, backup_finish_date, user_name
+FROM         dbo.backupset
+WHERE     ((CONVERT(char(10), backup_start_date, 103) = CONVERT(char(10), GETDATE() - 1, 103)) AND (type = 'D') or (CONVERT(char(10), backup_start_date, 103) = CONVERT(char(10), GETDATE() -1, 103)) AND (type = 'I'))
+ORDER BY database_name
+
+'====================================================
+Space Used and Free Space in the Files
+====================================================
+
+select  name,filename,size*8.0*1024/(1024*1024) as TotalMB, fileproperty(name,'SpaceUsed')*8.0*1024/(1024*1024) as UsedMB, size*8.0*1024/(1024*1024) -  fileproperty(name,'SpaceUsed')*8.0*1024/(1024*1024) as FreeMB from sysfiles
+
+
+------------------------------------------------------------------------------======================================================================
+identify when a database was restored, the source of the backup and the date of the backup
+======================================================================
+
+SELECT [rs].[destination_database_name], 
+[rs].[restore_date], 
+[bs].[backup_start_date], 
+[bs].[backup_finish_date], 
+[bs].[database_name] as [source_database_name], 
+[bmf].[physical_device_name] as [backup_file_used_for_restore]
+FROM msdb..restorehistory rs
+INNER JOIN msdb..backupset bs
+ON [rs].[backup_set_id] = [bs].[backup_set_id]
+INNER JOIN msdb..backupmediafamily bmf 
+ON [bs].[media_set_id] = [bmf].[media_set_id] 
+ORDER BY [rs].[restore_date] DESC
+
+
+========================================================================
+
+select name,size*8.0*1024/(1024*1024)as TotalMB, fileproperty(name,'SpaceUsed')*8.0*1024/(1024*1024) as UsedMB, size*8.0*1024/(1024*1024) -  fileproperty(name,'SpaceUsed')*8.0*1024/(1024*1024) as FreeMB from sysfiles
+
+=====================================================
+To truncate the Log file without backup
+=====================================================
+BACKUP LOG GISPRODUCTION_Jun_2012 with truncate_only
+
+use GISPRODUCTION_Jun_2012 
+dbcc shrinkfile(GISTESTTRANSFER_data,0) 
+
+
+SQL 2008
+--------
+USE [GISPRODUCTION_October_2012]
+GO
+DBCC SHRINKFILE (N'GISTESTTRANSFER_Data' , 0, TRUNCATEONLY)
+GO
+
+
+'======================================================
+ALTER DATABASE tempdb
+MODIFY FILE
+(NAME='TEMPDEV',
+FILENAME='<new drive letter and path> empdb.mdf')
+go
+ALTER DATABASE TEMPDB
+MODIFY FILE
+(NAME='TEMPLOG',
+FILENAME='<new drive letter and path> emplog.ldf')
+go 
+
+then stop and re-start the SQL services, this will create the new files on the other drive and then you can delete the old one on c: drive.
+
+=======================================================
+
+'====================
+No of user sessions
+=====================
+select login_name, count(session_id) as session_count from sys.dm_exec_sessions group by login_name
+
+===========================================================================
+sys.dm_os_memory_objects - SQL Server memory usage 
+==========================================================================
+SELECT SUM (pages_allocated_count * page_size_in_bytes) as 'Bytes Used', type 
+FROM sys.dm_os_memory_objects
+GROUP BY type 
+ORDER BY 1 DESC;
+GO
+
+--------------------------------------------------------------------------------
+SELECT * FROM sys.dm_os_wait_stats
+
+SELECT wait_type, wait_time_ms FROM sys.dm_os_wait_stats; 
+
+GO 
+
+========================================
+FREE SPACE ---FILEPROPERTY----- 
+========================================
+SELECT DB_NAME() AS DbName, 
+name AS FileName, 
+size/128.0 AS CurrentSizeMB,  
+size/128.0 - CAST(FILEPROPERTY(name, 'SpaceUsed') AS INT)/128.0 AS FreeSpaceMB 
+FROM sys.database_files; 
+
+
+========================================
+SQL Server Script to Display Job History 
+========================================
+select job_name, run_datetime, run_duration
+from
+(
+    select job_name, run_datetime,
+        SUBSTRING(run_duration, 1, 2) + ':' + SUBSTRING(run_duration, 3, 2) + ':' +
+        SUBSTRING(run_duration, 5, 2) AS run_duration
+    from
+    (
+        select DISTINCT
+            j.name as job_name, 
+            run_datetime = CONVERT(DATETIME, RTRIM(run_date)) +  
+                (run_time * 9 + run_time % 10000 * 6 + run_time % 100 * 10) / 216e4,
+            run_duration = RIGHT('000000' + CONVERT(varchar(6), run_duration), 6)
+        from msdb..sysjobhistory h
+        inner join msdb..sysjobs j
+        on h.job_id = j.job_id
+    ) t
+) t
+order by job_name, run_datetime
+=================================================================================
+To check version details of sql server
+=================================================================================
+
+SELECT @@VERSION
+
+=================================================================================
+Version check for sql 2008
+=================================================================================
+
+SELECT SERVERPROPERTY('productversion'), SERVERPROPERTY ('productlevel'), SERVERPROPERTY ('edition')
+
+=============================
+sp_helpfiles for all databases
+==============================
+EXEC sp_MSforeachdb 'USE ? SELECT ''?'', SF.filename, SF.size FROM sys.sysfiles SF' 
+
+=============================
+Top 10 Queries for Performance Tunning
+==============================
+
+SELECT TOP 10 SUBSTRING(qt.TEXT, (qs.statement_start_offset/2)+1,
+((CASE qs.statement_end_offset
+WHEN -1 THEN DATALENGTH(qt.TEXT)
+ELSE qs.statement_end_offset
+END - qs.statement_start_offset)/2)+1),
+qs.execution_count,
+qs.total_logical_reads, qs.last_logical_reads,
+qs.total_logical_writes, qs.last_logical_writes,
+qs.total_worker_time,
+qs.last_worker_time,
+qs.total_elapsed_time/1000000 total_elapsed_time_in_S,
+qs.last_elapsed_time/1000000 last_elapsed_time_in_S,
+qs.last_execution_time,
+qp.query_plan
+FROM sys.dm_exec_query_stats qs
+CROSS APPLY sys.dm_exec_sql_text(qs.sql_handle) qt
+CROSS APPLY sys.dm_exec_query_plan(qs.plan_handle) qp
+ORDER BY qs.total_logical_reads DESC -- logical reads
+-- ORDER BY qs.total_logical_writes DESC -- logical writes
+-- ORDER BY qs.total_worker_time DESC -- CPU time
+
+
+========================================
+Script for checking restoraiton and path
+========================================
+
+SELECT rh.restore_history_id
+      ,rh.restore_date
+      ,rh.destination_database_name
+      ,rh.restore_type, rf.destination_phys_drive,rf.destination_phys_name
+FROM restorehistory rh 
+left outer join restorefile rf on (rh.restore_history_id = rf.restore_history_id)
+  order by restore_date desc
+
+
+-==================================
+Backup Details
+==============================
+SELECT 
+s.database_name,
+CAST(CAST(s.backup_size / 1000000 AS INT) AS VARCHAR(14)) + ' ' + 'MB' AS bkSize,
+s.backup_start_date,
+CASE s.[type]
+WHEN 'D' THEN 'Full'
+WHEN 'I' THEN 'Differential'
+END AS BackupType
+FROM msdb.dbo.backupset s
+INNER JOIN msdb.dbo.backupmediafamily m ON s.media_set_id = m.media_set_id
+WHERE s.database_name = DB_NAME() and s.[type] in ('D','I') -- Remove this line for all the database
+ORDER BY backup_start_date DESC, backup_finish_date
+
+======================================
+Script to find the job details
+======================================
+
+select s.name,step_id,step_name,database_name,command,ss.enabled,next_run_date,next_run_time
+from sysjobs s,sysjobsteps sj,sysjobschedules ss
+where s.job_id=sj.job_id and s.job_id=ss.job_id and sj.job_id=ss.job_id and database_name not in('master')
+order by s.name,step_id
+
+SELECT
+	distinct j.name AS Name
+	, j.description AS Description
+	, j.start_step_id AS StartStepID
+	, s.step_id AS StepID
+	, s.step_name AS StepName
+	, s.database_name AS DatabaseName
+	, s.subsystem AS CommandType
+	, s.command AS Command
+		, c.name AS CategoryName
+FROM
+	msdb.dbo.sysjobs as j with (nolock) inner join msdb.dbo.sysjobsteps as s with (nolock) on j.job_id = s.job_id
+	inner join msdb.dbo.syscategories as c with (nolock) on j.category_id = c.category_id
+WHERE
+	j.enabled = 1
+ORDER BY
+	j.name ASC
+	, step_id ASC
+
+SELECT * FROM sys.dm_exec_requests WHERE session_id =55 to find percent of process id.
+
+------------------------------------------------------------------------------------------------------------------------
+estimated_completion_time in minutes
+--------------------------------------------------------------------------------------------------------------------------
+
+
+SELECT
+	session_id,
+	start_time,
+	status,
+	command,
+	percent_complete,
+	estimated_completion_time,
+	estimated_completion_time /60/1000 as estimate_completion_minutes,
+	--(select convert(varchar(5),getdate(),8)),
+	DATEADD(n,(estimated_completion_time /60/1000),GETDATE()) as estimated_completion_time
+
+FROM    sys.dm_exec_requests where command = 'BACKUP DATABASE' OR command = 'RESTORE DATABASE'
+
+-----------------------------------------------------------
+script to find missing indexes:
+-----------------------------------------------------------
+
+
+
+SELECT 
+
+  migs.avg_total_user_cost * (migs.avg_user_impact / 100.0) * (migs.user_seeks + migs.user_scans) AS improvement_measure, 
+
+  'CREATE INDEX [missing_index_' + CONVERT (varchar, mig.index_group_handle) + '_' + CONVERT (varchar, mid.index_handle) 
+
+  + '_' + LEFT (PARSENAME(mid.statement, 1), 32) + ']'
+ 
+  + ' ON ' + mid.statement 
+
+  + ' (' + ISNULL (mid.equality_columns,'') 
+
+    + CASE WHEN mid.equality_columns IS NOT NULL AND mid.inequality_columns IS NOT NULL THEN ',' ELSE '' END 
+
+    + ISNULL (mid.inequality_columns, '')
+ 
+  + ')' 
+
+  + ISNULL (' INCLUDE (' + mid.included_columns + ')', '') AS create_index_statement, 
+
+  migs.*, mid.database_id, mid.[object_id]
+ 
+FROM sys.dm_db_missing_index_groups mig
+ 
+INNER JOIN sys.dm_db_missing_index_group_stats migs ON migs.group_handle = mig.index_group_handle
+ 
+INNER JOIN sys.dm_db_missing_index_details mid ON mig.index_handle = mid.index_handle
+ 
+WHERE migs.avg_total_user_cost * (migs.avg_user_impact / 100.0) * (migs.user_seeks + migs.user_scans) > 10
+ 
+ORDER BY migs.avg_total_user_cost * migs.avg_user_impact * (migs.user_seeks + migs.user_scans) DESC
+
+
+============================================================
+Fragmentation report
+============================================================
+dbcc showcontig with tableresults,all_indexes
+
+============================================================
+Stats update Date
+============================================================
+
+– For SQL 2000
+SELECT 'Index Name' = i.name, 'Table Name' = o.name,
+'Statistics Date' = STATS_DATE(i.id, i.indid)
+FROM sysobjects o, sysindexes i
+where o.id = i.id
+
+-------------------
+- For SQL 2005/SQL 2008
+select a.id as 'ObjectID', isnull(a.name,'Heap') as 'IndexName', b.name 
+as 'TableName',
+stats_date (id,indid) as stats_last_updated_time
+from sys.sysindexes as a
+inner join sys.objects as b
+on a.id = b.object_id
+where b.type = 'U'
+
+USE AdventureWorks
+GO
+SELECT name AS index_name,
+STATS_DATE(OBJECT_ID, index_id) AS StatsUpdated
+FROM sys.indexes
+WHERE OBJECT_ID = OBJECT_ID('HumanResources.Department')
+GO
+
+-------------------------------------------------
+Query to find backup logs
+-------------------------------------------------
+
+select database_name,backup_start_date,backup_finish_date,
+
+case
+
+when type='D' then 'FULL'
+when type='I' then 'DIFF'
+when type='L' then 'LOG'
+
+end as backup_type
+
+from msdb..backupset
+where backup_start_date between '2013-02-08 00:00:00.000' and '2013-02-08 23:59:59.000'
+order by backup_start_date desc
+
+-------------------------------------------------
+Common DMV
+-------------------------------------------------
+ sys.dm_db_index_usage_stats
+ sys.dm_db_index_operational_stats
+ sys.dm_db_index_physical_stats
+ sys.dm_db_missing_index_groups
+ sys.dm_db_missing_index_group_stats
+ sys.dm_db_missing_index_details
+
+--------------------------------------------
+Rebuilt index
+--------------------------------------------
+ALTER INDEX  PolicyNo ON dbo.Policy1_stage REBUILD with (ONLINE = ON)
+
+----------------------------------------------
+Update stats
+----------------------------------------------
+UPDATE STATISTICS dbo.PDBDocumentContent WITH FULLSCAN  
+
+-------------------------------------------------
+grant permistion on object.
+---------------------------------------------
+grant exec on sp_OADestroy to IPRU
+
+use MyDatabase
+go
+GRANT EXECUTE ON SCHEMA::[dbo] TO MyUser
+go
+
+-----------------------------------------
+synch status
+------------------------------------------
+select *from msdb..log_shipping_monitor_secondary order by 1 desc, 2 asc
+
+-----------------------------------------
+Standby Restore
+------------------------------------------
+
+
+RESTORE LOG [ICARE_27072013] FROM  DISK = N'G:\icare Prod TRN files\ICARE_tlog_201307301300.TRN' WITH  FILE = 1,  
+STANDBY = N'C:\Program Files\Microsoft SQL Server\MSSQL10.SQL2008\MSSQL\Backup\ICARE.CKP',  NOUNLOAD,  STATS = 10
+GO
+
+======================================
+schema level permistions
+========================================
+GRANT INSERT ON SCHEMA :: HumanResources TO guest
+

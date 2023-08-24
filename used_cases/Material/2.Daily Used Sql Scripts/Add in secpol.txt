@@ -1,0 +1,11 @@
+Add SQLADMIN to the following "User Rights Asssignment" in "Local Policies" before installing:
+
+act as part of os
+allow log on locally--------------when you change local to admin group account.
+bypass traverse checking
+debug programs
+impersnate a client after impersonation
+logon as batch job
+log on as service
+replace a process level token
+log pages memory----new i have added.

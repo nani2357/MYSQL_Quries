@@ -1,0 +1,15 @@
+create table #tmp1
+( d2 varchar(2000) )
+
+insert into #tmp1 exec xp_cmdshell 'dir G:\mssql\BACKUP\VCDB\*trn /od' -- put Log file path here
+
+delete from #tmp1 where d2 like '%bytes%'
+
+Select 'Restore log PDCDATA_old ' +char(13)  +' from disk = '+ char(39)+'F:\MSSQL\backup\PDCDATA_old\'  -- put Log file path here
++ltrim(right ( d2,(len (d2)-38)) ) 
+ + '''  with standby=' + char(39)+ 'G:\mssql\BACKUP\VCDB\VCDB_undofile.dat' + char(39)+ ', stats=10' + char(13) + '   ' from #tmp1 
+where (d2 is not null and (len (d2)-38)>0 )
+and (
+	stuff(stuff(stuff(stuff(replace(right(d2,18),'.trn',''),9,0,' '),5,0,'-'),8,0,'-'),14,0,':')+':00.000'
+
+)>='<datetime>' -- specify date   eg:2006-02-11 00:00:00.000

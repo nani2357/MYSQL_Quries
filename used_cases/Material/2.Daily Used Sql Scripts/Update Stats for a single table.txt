@@ -1,0 +1,8 @@
+Query to update stats of a single table
+
+
+UPDATE STATISTICS <schema_name>.<table_name>.
+
+Eg
+
+UPDATE STATISTICS dbo.tblMarkPrice 

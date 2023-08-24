@@ -1,0 +1,10 @@
+Query to see indexes on a specific table
+
+select * from sys.indexes
+where object_id = (select object_id from sys.objects where name = 'MYTABLE')
+
+Query to Rebuild all Indexes on a specific table
+
+ALTER INDEX ALL ON Table_Name
+REBUILD WITH (FILLFACTOR = 80, SORT_IN_TEMPDB = ON,
+              STATISTICS_NORECOMPUTE = ON);

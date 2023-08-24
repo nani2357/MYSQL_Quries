@@ -1,0 +1,85 @@
+Performance Tuning
+CPU >90%
+Memory>90%
+Temp DB Issues
+Checking Blockings
+Application/Query Running Slow
+
+Health Checks
+CPU usage
+Memory Usage
+Blockings
+Free space on Drives
+
+Sql Server error log
+EventViewer
+Check the Sql Services are up and running
+Whether databases are up and running or not
+What is the PORT
+
+sp_who2
+
+Check Sql server Error Log
+
+Check all the processes using sp_who2 or select *from sys.sysprocesses
+check all processes from spid>50, check login, command and Blockings
+Blocking are very important.. if any blocking are there then they are going to kill the performance
+Find the blocking processes
+and  check who is running the processes
+then contact him using communicator tool
+ask him what query he is running
+will ask him 
+
+Check any jobs are running and check since what time jobs are running check the duration of that job last time when it ran from job history -- using Job Activity monitor
+
+backup job,
+check db job
+dbcc update statistics
+Indexing job
+
+Check max server memory and min. server memory
+Give 80-90% to sql server if only sql server is running in the machine
+If any RS and AS are running give 50-60% to sql server and 30% to RS or AS
+
+Check all cpus are selected from processors tab in sql server properties.
+
+Check index fill factor in Database settings of Sql server properties-- make sure it is 80% is there
+
+check Cost Threshold parallesm and Max DOP values from Advanced tab in Server properties
+usually Cost Threshold parallesm will be in a range of 4 to 5
+The Max Degree of Parallelism(MDop) simply defines the number of processors\cores that SQL Server will use when the optimizer determines parallelism is needed.  
+The best value is no. of cores but not exceeded more than 8
+
+Will Check Rebuild, Reorg Indexing and Update statistics Jobs
+If the jobs are failed or cancelled I will rerun it by taking proper apporvals
+
+
+
+The Compatibility level of the database
+
+
+
+TempDB
+
+Keeping Temp DB data files and log files in a separate is recommanded.
+
+Add the data files based the logical processors to the Temp DB
+if 2 logical processors are there 2 data files should be there for Temp DB
+
+DBCC freeprocache
+DBCC freesystemcache
+DBCC Dropcleanbuffers
+DBCC freesessioncache
+Checkpoint
+
+Health Checks
+
+check the sql server error log
+check the status of all the databases
+check the sql services running or not
+whether all mentioned jobs are succeeded or not
+Check the event viewer
+Check the Drives whether all drives is having enough free space or not
+check CPU and memory usage
+
+

@@ -1,0 +1,6 @@
+RESTORE FILELISTONLY From Disk = 'E:\SQLBKP\230911\ssodb.BAK'
+
+Restore Database SSODB From Disk = 'E:\SQLBKP\230911\ssodb.BAK'
+WITH REPLACE ,STATS = 5,
+Move 'SSODB' To 'D:\MSSQL\DATA\ssodb\SSODB.mdf',
+Move 'SSODB_log' To 'E:\MSSQL\DATA\ssodb\SSODB_log.LDF'

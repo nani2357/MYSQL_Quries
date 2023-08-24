@@ -1,0 +1,30 @@
+Monitor Replication using T-Sql
+
+
+To monitor Publishers, publications, and subscriptions from the Distributor
+At the Distributor on the distribution database, execute sp_replmonitorhelppublisher. This returns monitoring information for all Publishers using this Distributor. To limit the result set to a single Publisher, specify @publisher.
+
+At the Distributor on the distribution database, execute sp_replmonitorhelppublication. This returns monitoring information for all publications using this Distributor. To limit the result set to a single Publisher, publication, or published database, specify @publisher, @publication, or @publisher_db, respectively.
+
+At the Distributor on the distribution database, execute sp_replmonitorhelpsubscription. This returns monitoring information for all subscriptions using this Distributor. To limit the result set to subscriptions belonging to a single Publisher, publication, or published database, specify @publisher, @publication, or @publisher_db, respectively.
+
+To monitor transactional commands waiting to be applied at the Subscriber
+At the Distributor on the distribution database, execute sp_replmonitorsubscriptionpendingcmds. This returns monitoring information for all commands pending for all subscriptions using this Distributor. To limit the result set to commands pending for subscriptions belonging to a single Publisher, Subscriber, publication, or published database, specify @publisher, @subscriber, @publication, or @publisher_db, respectively.
+To monitor merge changes waiting to be uploaded or downloaded
+At the Publisher on the publication database, execute sp_showpendingchanges. This returns a result set showing information on changes that are waiting to be replicated to Subscribers. To limit the result set to changes that belong to a single publication or article, specify @publication or @article, respectively.
+
+At a Subscriber on the subscription database, execute sp_showpendingchanges. This returns a result set showing information on changes that are waiting to be replicated to the Publisher. To limit the result set to changes that belong to a single publication or article, specify @publication or @article, respectively.
+
+To monitor Merge Agent sessions
+At the Distributor on the distribution database, execute sp_replmonitorhelpmergesession. This returns monitoring information, including Session_id, on all Merge Agent sessions for all subscriptions using this Distributor. You can also obtain Session_id by querying the MSmerge_sessions system table.
+
+At the Distributor on the distribution database, execute sp_replmonitorhelpmergesessiondetail. Specify a Session_id value from step 1 for @session_id. This displays detailed monitor information about the session.
+
+Repeat step 2 for each session of interest.
+
+To monitor Merge Agent sessions for pull subscriptions from the Subscriber
+At the Subscriber on the subscription database, execute sp_replmonitorhelpmergesession. For a given subscription, specify @publisher, @publication, and the name of the publication database for @publisher_db. This returns monitoring information for the last five Merge Agent sessions for this subscription. Note the value of Session_id for sessions of interest in the result set.
+
+At the Subscriber on the subscription database, execute sp_replmonitorhelpmergesessiondetail. Specify a Session_id value from step 1 for @session_id. This displays detailed monitoring information about the session.
+
+Repeat step 2 for each session of interest.

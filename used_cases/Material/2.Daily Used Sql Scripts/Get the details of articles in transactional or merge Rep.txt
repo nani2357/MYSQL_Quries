@@ -1,0 +1,11 @@
+To get the details of articles in transactional or merge SQL Server replication in a published database, run the following T-SQL.
+
+
+SELECT st.name [published object], st.schema_id, st.is_published , st.is_merge_published, is_schema_published  
+FROM sys.tables st WHERE st.is_published = 1 or st.is_merge_published = 1 or st.is_schema_published = 1  
+UNION  
+SELECT sp.name, sp.schema_id, 0, 0, sp.is_schema_published  
+FROM sys.procedures sp WHERE sp.is_schema_published = 1  
+UNION  
+SELECT sv.name, sv.schema_id, 0, 0, sv.is_schema_published  
+FROM sys.views sv WHERE sv.is_schema_published = 1;

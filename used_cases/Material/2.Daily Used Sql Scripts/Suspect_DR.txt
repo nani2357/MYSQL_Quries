@@ -1,0 +1,26 @@
+
+When Database goes into SUSPECT mode due to unavailability of Drive.
+Steps to get the database back into standby/restoring mode (in DR Server) :
+
+Following is the error received while tried to restore the log :
+
+ Server: Msg 4323, Level 16, State 2, Line 1
+ The database is marked suspect. Transaction logs cannot be restored. Use RESTORE DATABASE to recover the database.
+ Server: Msg 3013, Level 16, State 1, Line 1
+ RESTORE LOG is terminating abnormally.
+
+Steps Taken :
+
+1. sp_resetstatus 'baysqldb623' 
+
+-- Prior to updating sysdatabases entry for database 'baysqldb623', mode = 56 and status = 304 (status suspect_bit = 256).
+-- For row in sysdatabases for database 'baysqldb623', the status bit 256 was forced off and mode was forced to 0.
+-- Warning: You must recover this database prior to access.
+
+2. Update STATUS column in SYSDATABASES Table
+
+   update sysdatabases set status = 32 where dbid = 7
+
+3. Take stop & start of sql services
+
+4. Apply last applied TRN File on to the DR Database.

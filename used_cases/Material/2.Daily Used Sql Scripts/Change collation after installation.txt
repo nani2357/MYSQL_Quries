@@ -1,0 +1,7 @@
+First stop the sql server first
+open cmd prompt
+goto Sql server Binn folder in cmd prompt
+then run below query
+sqlservr -m -T4022 -T3659 -s"Instance name" -q "new collationsettings"
+Example
+sqlservr -m -T4022 -T3659 -s"Sql2k12" -q"Latin1_General_CI_AS"

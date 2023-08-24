@@ -1,0 +1,36 @@
+-- this will give the current servername
+Select @@servername
+
+-- drop the old servername
+sp_dropserver 'ACCOUNTS'
+
+-- add the new servername
+sp_addserver 'ACCOUNTS','local'
+
+now take a stop-start for new server name to take effect.
+
+---------------------------
+Blocks Properties - PMEIBMX365003\NEW
+---------------------------
+Error 14274: Cannot add, update, or delete a job (or its steps or schedules) that originated from an MSX server.
+The job was not saved.
+---------------------------
+OK   
+---------------------------
+
+
+Please check the originating_server column in msdb..sysjobs by running:
+SELECT *
+FROM msdb..sysjobs 
+
+and verify if all jobs have the correct server name for originating_server.
+
+If not, update this value with the correct server name by running following script
+USE msdb
+GO
+DECLARE @server sysname
+SET @server = CAST(SERVERPROPERTY('ServerName')AS sysname)
+UPDATE sysjobs
+SET originating_server = @server
+WHERE originating_server = '<wrong_servername>'
+
