@@ -67,12 +67,22 @@ select student_name, students_marks from ineuron_students where student_batch = 
 
 
 
+select * from ineuron_students
+
+select student_id, student_batch, student_stream, students_marks, row_number() 
+over(order by students_marks) as 'row_number' from ineuron_students
+
+
+select student_id, student_batch, student_stream, students_marks, row_number() 
+over(partition by student_batch order by students_marks) as 'row_number' from ineuron_students
+
+select student_id, student_batch, student_stream, students_marks, row_number() 
+over(partition by student_stream order by students_marks) as 'row_number' from ineuron_students
 
 
 
-
-
-
+select * from (select student_id, student_batch, student_stream, students_marks, row_number() 
+over(partition by student_stream order by students_marks) as 'row_numb' from ineuron_students) as test  where row_numb = 1
 
 
 
